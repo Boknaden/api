@@ -1,5 +1,6 @@
 let express = require('express'),
     port    = 1337,
+    path    = require('path'),
     fs      = require('fs'),
     app     = express(),
     dotenv  = require('dotenv').config()
