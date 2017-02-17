@@ -26,4 +26,5 @@ fs.readdirSync('./api').filter(f=>f.endsWith('.js') && !f.startsWith('_')).sort(
 
 var server = app.listen(process.env.PORT, function (){
     console.log('Boknaden API v' + process.env.VERSION + ' Port: ' + process.env.PORT)
+    console.log((process.env.DEBUG) ? "Environment: Development" : "Environment: Production")
 })
