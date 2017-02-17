@@ -19,6 +19,11 @@ function registerEndpoint(app, routePath, filePath) {
     app.use(routePath, router)
 }
 
+app.use(function (req, res, next) {
+    res.setHeader('Content-Type', 'application/json')
+    next()
+})
+
 fs.readdirSync('./api').filter(f=>f.endsWith('.js') && !f.startsWith('_')).sort().forEach(file => {
     const route = file.slice(0, -3)
     registerEndpoint(app, `/${route}/`, path.join(__dirname, './api', file))
