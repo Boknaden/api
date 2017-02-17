@@ -1,3 +1,7 @@
 exports.get = function (req, res) {
-    res.status(200).send('Pong')
+    if (process.env.DEBUG) {
+        res.status(200).send('Pong')
+    } else {
+        res.status(404).send();
+    }
 }
