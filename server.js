@@ -5,6 +5,7 @@ let express = require('express'),
     app     = express(),
     dotenv  = require('dotenv').config()
 
+app.disable('x-powered-by')
 
 function registerEndpoint(app, routePath, filePath) {
     const methods = ['get', 'post', 'put', 'delete']
