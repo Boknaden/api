@@ -3,7 +3,9 @@ let express = require('express'),
     path    = require('path'),
     fs      = require('fs'),
     app     = express(),
-    dotenv  = require('dotenv').config()
+    dotenv  = require('dotenv').config(),
+    helmet  = require('helmet'),
+    log      = require('./ConsoleManager.js').create()
 
 app.disable('x-powered-by')
 
@@ -20,6 +22,8 @@ function registerEndpoint(app, routePath, filePath) {
     app.use(routePath, router)
 }
 
+app.use(helmet())
+
 app.use(function (req, res, next) {
     res.setHeader('Content-Type', 'application/json')
     next()
@@ -31,6 +35,11 @@ fs.readdirSync('./api').filter(f=>f.endsWith('.js') && !f.startsWith('_')).sort(
 })
 
 var server = app.listen(process.env.PORT, function (){
-    console.log('Boknaden API v' + process.env.VERSION + ' Port: ' + process.env.PORT)
-    console.log((process.env.DEBUG) ? "Environment: Development" : "Environment: Production")
+    log.printLn('Boknaden API v' + process.env.VERSION + ' Port: ' + process.env.PORT)
+    let environment = (parseInt(process.env.DEBUG)===1) ? "Development" : "Production"
+    log.printObj({
+        0: "Environment: ",
+        1: environment,
+        2: '-'
+    })
 })
