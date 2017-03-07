@@ -9,7 +9,7 @@ function getAds (req, res) {
         sort        = q.sort || 'DESC',
         offset      = (page - 1) * limit,
         vals  = [],
-        query = "SELECT AdID, UserID, UniversityID, AdName, CreatedDate, UpdatedDate FROM Ads "
+        query = "SELECT adid, userid, universityid, adname, createddate, updateddate FROM ads "
     query    += ((typeof course !== 'undefined') ? "WHERE CourseID = ? " : "")
     query    += ((typeof university !== 'undefined') ?
                     ((typeof course !== 'undefined') ?
@@ -50,7 +50,7 @@ function newAd (req, res) {
         user            = parseInt(q.userid),
         university      = parseInt(q.universityid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields),
-        query           = "INSERT INTO Ads ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
+        query           = "INSERT INTO ads ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
 
     console.log(query)
     if (!valuesNotEmpty) {

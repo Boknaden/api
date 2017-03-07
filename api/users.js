@@ -1,7 +1,7 @@
 var shared = require('./_shared')
 function getUsers (req, res) {
     req.service.mysql.query(
-        'SELECT Username, CreatedDate FROM Users',
+        'SELECT username, createddate FROM users',
         function (err, result, fields) {
         if (err) {
             res.send({err: err})
@@ -18,7 +18,7 @@ function getUsers (req, res) {
 function newUser (req, res) {
     var fields          = ["username", "passphrase", "email", "firstname", "lastname"]
     var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
-    var query           = "INSERT INTO Users ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
+    var query           = "INSERT INTO users ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
 
     if (!valuesNotEmpty) {
         res.send({err: 'Not all parameters specified.'})
