@@ -33,7 +33,7 @@ function newUser (req, res) {
         values: [req.body.username.trim(),passHash,req.body.email.trim(),req.body.firstname.trim(),req.body.lastname.trim()],
     }, function (err, results, fields) {
         if (err) {
-            res.send({err: err, results: results, fields: fields})
+            res.send({err: err, results: results, fields: fields, data: req.body})
             return
         }
         res.send({payload: results})

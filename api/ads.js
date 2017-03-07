@@ -64,7 +64,7 @@ function newAd (req, res) {
         values: [user, university, q.adname.trim()],
     }, function (err, results, fields) {
         if (err) {
-            res.send({err: err, results: results, fields: fields})
+            res.send({err: err, results: results, fields: fields, data: req.body})
             return
         }
         res.send({payload: results})
