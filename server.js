@@ -1,11 +1,16 @@
-let express = require('express'),
-    port    = 1337,
-    path    = require('path'),
-    fs      = require('fs'),
-    app     = express(),
-    dotenv  = require('dotenv').config(),
-    helmet  = require('helmet'),
-    log      = require('./ConsoleManager.js').create()
+let express     = require('express'),
+    port        = 1337,
+    path        = require('path'),
+    fs          = require('fs'),
+    app         = express(),
+    dotenv      = require('dotenv').config(),
+    helmet      = require('helmet'),
+    bodyParser  = require('body-parser'),
+    log         = require('./ConsoleManager.js').create(),
+    config      = require('./config.js'),
+    mysql       = require('mysql'),
+    bcrypt      = require('bcrypt'),
+    connection  = mysql.createConnection(config.mysql)
 
 app.disable('x-powered-by')
 
@@ -23,9 +28,20 @@ function registerEndpoint(app, routePath, filePath) {
 }
 
 app.use(helmet())
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+app.use(registerDependencies)
+
+function registerDependencies (req, res, next) {
+    req.service = {
+        mysql: connection,
+        bcrypt: bcrypt,
+    }
+    next()
+}
 
 app.use(function (req, res, next) {
-    res.setHeader('Content-Type', 'application/json')
+    res.set('Content-Type', 'application/json')
     next()
 })
 
