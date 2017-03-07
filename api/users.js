@@ -3,6 +3,10 @@ function getUsers (req, res) {
     req.service.mysql.query(
         'SELECT Username, CreatedDate FROM users',
         function (err, result, fields) {
+        if (err) {
+            res.send({err: err})
+            return
+        }
         if (result.length === 0) {
             res.send({err: 'No results.'})
         } else {
