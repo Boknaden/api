@@ -1,3 +1,5 @@
+/* DRY (IGD: ikke gjenta deg) */
+
 function genQuestionMarks (fields) {
     var qmarks = ""
 
@@ -8,7 +10,7 @@ function genQuestionMarks (fields) {
             qmarks += "?,"
         }
     }
-    
+
     return qmarks
 }
 

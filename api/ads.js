@@ -46,13 +46,12 @@ function getAds (req, res) {
 
 function newAd (req, res) {
     var q               = req.body,
-        fields          = ["userid", "universityid", "adname"],
+        fields          = ["userid", "courseid", "adname"],
         user            = parseInt(q.userid),
-        university      = parseInt(q.universityid),
+        course          = parseInt(q.courseid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields),
         query           = "INSERT INTO ads ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
 
-    console.log(query)
     if (!valuesNotEmpty) {
         res.send({err: 'Not all parameters specified.'})
         return
