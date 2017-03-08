@@ -52,6 +52,7 @@ function newUser (req, res) {
 function registerUserCourse (req, res, courseid, userid) {
     if (!courseid) {
         res.send({err: 'Not all parameters specified.'})
+        return
     }
     req.service.mysql.query({
         sql: "INSERT INTO usercourses (userid, courseid) VALUES (?, ?)",
