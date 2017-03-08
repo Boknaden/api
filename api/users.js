@@ -57,19 +57,19 @@ function registerUserCourse (req, res, courseid, userid) {
         sql: "INSERT INTO usercourses (userid, courseid) VALUES (?, ?)",
         timeout: 10000,
         values: [userid, courseid],
-    }, function (cErr, cResults, cFields) {
-        if (cErr) {
+    }, function (err, results, fields) {
+        if (err) {
             res.send({
-                err: cErr,
-                courseResults: cResults,
-                courseFields: cFields,
+                err: err,
+                courseResults: results,
+                courseFields: fields,
                 userData: req.body
             })
             return
         }
         res.send({
             payload: {
-                user: uResults,
+                user: results,
                 course: cResults
             }
         })
