@@ -54,9 +54,9 @@ fs.readdirSync('./api').filter(f=>f.endsWith('.js') && !f.startsWith('_')).sort(
 
 /* Initialiserer og starter APIet */
 var server = app.listen(process.env.PORT, function (){
-    log.printLn('Boknaden API v' + process.env.VERSION + ' Port: ' + process.env.PORT)
+    console.log('Boknaden API v' + process.env.VERSION + ' Port: ' + process.env.PORT)
     let environment = (parseInt(process.env.DEBUG)===1) ? "Development" : "Production"
-    log.printObj({
+    console.log({
         0: "Environment: ",
         1: environment,
         2: '-'
