@@ -1,7 +1,7 @@
 var shared = require('./_shared')
 function getUsers (req, res) {
     req.service.mysql.query(
-        'SELECT username, createddate FROM users',
+        'SELECT username, email, firstname, lastname, lastlogin, createddate FROM users',
         function (err, result, fields) {
         if (err) {
             res.send({err: err})

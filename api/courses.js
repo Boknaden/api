@@ -1,7 +1,7 @@
 var shared = require('./_shared')
-function getUniversities (req, res) {
+function getCourses (req, res) {
     req.service.mysql.query(
-        'SELECT universityid, universityname, longitude, latitude, createddate FROM universities',
+        'SELECT courseid, coursename, universityid FROM courses',
         function (err, result, fields) {
         if (err) {
             res.send({err: err})
@@ -15,7 +15,7 @@ function getUniversities (req, res) {
     })
 }
 
-function newUniversity (req, res) {
+function newCourse (req, res) {
     // var fields          = ["universityid", "universityname", "longitude", "latitude"]
     // var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
     // var query           = "INSERT INTO universities ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
@@ -42,6 +42,6 @@ function newUniversity (req, res) {
 }
 
 module.exports = {
-    get: getUniversities,
-    post: newUniversity,
+    get: getCourses,
+    post: newCourse,
 }
