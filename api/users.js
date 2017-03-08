@@ -17,6 +17,7 @@ function getUsers (req, res) {
 
 function newUser (req, res) {
     var fields          = ["username", "passphrase", "email", "firstname", "lastname"]
+    var courseid        = parseInt(req.body.courseid)
     var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
     var query           = "INSERT INTO users ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
 
@@ -31,22 +32,49 @@ function newUser (req, res) {
         sql: query,
         timeout: 10000,
         values: [req.body.username.trim().toLowerCase(),passHash,req.body.email.trim().toLowerCase(),req.body.firstname.trim(),req.body.lastname.trim()],
-    }, function (err, results, fields) {
-        if (err) {
-            res.send({err: err, results: results, fields: fields, data: req.body})
+    }, function (uErr, uResults, uFields) {
+        if (uErr) {
+            res.send({
+                err: uErr,
+                userResults: uResults,
+                userFields: uFields,
+                userData: req.body
+            })
             return
         }
-        res.send({payload: results})
+
+        registerUserCourse(req, res, courseid, uResults.insertId)
+
     })
 
 }
 
-function registerUserCourse (mysql, courseid, userid) {
+function registerUserCourse (req, res, courseid, userid) {
+    if (!courseid) {
+        res.send({err: 'Not all parameters specified.'})
+    }
+    req.service.mysql.query({
+        sql: "INSERT INTO usercourses (userid, courseid) VALUES (?, ?)",
+        timeout: 10000,
+        values: [userid, courseid],
+    }, function (cErr, cResults, cFields) {
+        if (cErr) {
+            res.send({
+                err: cErr,
+                courseResults: cResults,
+                courseFields: cFields,
+                userData: req.body
+            })
+            return
+        }
+        res.send({
+            payload: {
+                user: uResults,
+                course: cResults
+            }
+        })
 
-}
-
-function registerUserUniversity (mysql, universityid, userid) {
-
+    })
 }
 
 module.exports = {
