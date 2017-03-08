@@ -70,8 +70,7 @@ function registerUserCourse (req, res, courseid, userid) {
         }
         res.send({
             payload: {
-                user: results,
-                course: cResults
+                course: results
             }
         })
 
