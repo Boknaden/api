@@ -4,7 +4,8 @@ function getUsers (req, res) {
         'SELECT username, email, firstname, lastname, lastlogin, createddate FROM users',
         function (err, result, fields) {
         if (err) {
-            res.send({err: err})
+            console.log(err)
+            res.send({data: req.query})
             return
         }
         if (result.length === 0) {
@@ -34,12 +35,8 @@ function newUser (req, res) {
         values: [req.body.username.trim().toLowerCase(),passHash,req.body.email.trim().toLowerCase(),req.body.firstname.trim(),req.body.lastname.trim()],
     }, function (uErr, uResults, uFields) {
         if (uErr) {
-            res.send({
-                err: uErr,
-                userResults: uResults,
-                userFields: uFields,
-                userData: req.body
-            })
+            console.log(uErr)
+            res.send({userData: req.body})
             return
         }
 
@@ -60,12 +57,8 @@ function registerUserCourse (req, res, courseid, userid) {
         values: [userid, courseid],
     }, function (err, results, fields) {
         if (err) {
-            res.send({
-                err: err,
-                courseResults: results,
-                courseFields: fields,
-                userData: req.body
-            })
+            console.log(err)
+            res.send({userData: req.body})
             return
         }
         res.send({

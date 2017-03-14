@@ -18,7 +18,8 @@ function getCourses (req, res) {
         values: boundParams
     }, function (err, result, fields) {
         if (err) {
-            res.send({err: err})
+            console.log(err)
+            res.send({data: req.body})
             return
         }
         if (result.length === 0) {

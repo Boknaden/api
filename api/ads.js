@@ -33,7 +33,7 @@ function getAds (req, res) {
     }, (err, results, fields) => {
         if (err) {
             console.log(err)
-            res.send({err: err})
+            res.send({data: req.body})
         }
 
         getAdItemsForAds(req, res, results, (err2, results2, fields2) => {
@@ -50,7 +50,7 @@ function getAdItemsForAds (req, res, ads, cb) {
         adIds.push(ads[i].adid)
     }
 
-    var query = "SELECT aditems.aditemid, aditems.userid, aditems.adid, aditems.price FROM aditems WHERE adid IN (" + adIds.join(',') + ")"
+    var query = "SELECT aditems.aditemid, users.username, aditems.adid, aditems.text, aditems.description, aditems.price FROM aditems INNER JOIN users ON ( users.userid = aditems.userid AND adid IN (" + adIds.join(',') + ") )"
 
     req.service.mysql.query({
         sql: query,
@@ -91,8 +91,13 @@ function newAd (req, res) {
         valuesNotEmpty  = shared.checkEmptyValues(q, fields),
         query           = "INSERT INTO ads ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
 
+    if (q.hasOwnProperty('adid')) {
+        newAdItem(req, res)
+        return
+    }
+
     if (!valuesNotEmpty) {
-        res.send({err: 'Not all parameters specified.'})
+        res.status(404).send({err: 'Not all parameters specified.'})
         return
     }
 
@@ -102,11 +107,42 @@ function newAd (req, res) {
         values: [user, university, q.adname.trim()],
     }, function (err, results, fields) {
         if (err) {
-            res.send({err: err, results: results, fields: fields, data: req.body})
+            console.log(err)
+            res.status(404).send({data: req.body})
             return
         }
-        res.send({payload: results})
+        res.send({insertid: results.insertId})
     })
+}
+
+function newAdItem (req, res) {
+    var q               = req.body,
+        description     = q.description || null
+        fields          = ["userid", "adid", "text", "description", "price"],
+        user            = parseInt(q.userid),
+        adid            = parseInt(q.adid),
+        price           = parseInt(q.price),
+        valuesNotEmpty  = shared.checkEmptyValues(q, fields),
+        query           = "INSERT INTO aditems ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
+
+        if (!valuesNotEmpty) {
+            res.status(404).send({err: 'Not all parameters specified.'})
+            return
+        }
+
+        req.service.mysql.query({
+            sql: query,
+            timeout: 10000,
+            values: [user, adid, q.text.trim(), description, price],
+        }, function (err, results, fields) {
+            if (err) {
+                console.log(err)
+                res.send({data: req.body})
+                return
+            }
+            res.send({insertid: results.insertId})
+        })
+
 }
 
 module.exports = {
