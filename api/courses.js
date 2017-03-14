@@ -1,8 +1,22 @@
 var shared = require('./_shared')
 function getCourses (req, res) {
-    req.service.mysql.query(
-        'SELECT courseid, coursename, universityid FROM courses',
-        function (err, result, fields) {
+
+    var query,
+        universityid = parseInt(req.query.universityid) || false,
+        boundParams = []
+
+    if (universityid) {
+        query = "SELECT courses.courseid, courses.coursename, universities.universityname, courses.universityid FROM courses INNER JOIN universities ON (courses.universityid = universities.universityid AND courses.universityid = ?)"
+        boundParams.push(universityid)
+    } else {
+        query = 'SELECT courses.courseid, courses.coursename, universities.universityname, courses.universityid FROM courses INNER JOIN universities ON (courses.universityid = universities.universityid)'
+    }
+
+    req.service.mysql.query({
+        sql: query,
+        timeout: 10000,
+        values: boundParams
+    }, function (err, result, fields) {
         if (err) {
             res.send({err: err})
             return

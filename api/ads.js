@@ -8,8 +8,8 @@ function getAds (req, res) {
         page        = parseInt(q.page) || 1,
         sort        = q.sort || 'DESC',
         offset      = (page - 1) * limit,
-        vals  = [],
-        query = "SELECT adid, userid, universityid, adname, createddate, updateddate FROM ads "
+        vals        = [],
+        query       = "SELECT adid, userid, universityid, adname, createddate, updateddate FROM ads "
     query    += ((typeof course !== 'undefined') ? "WHERE CourseID = ? " : "")
     query    += ((typeof university !== 'undefined') ?
                     ((typeof course !== 'undefined') ?
@@ -35,13 +35,52 @@ function getAds (req, res) {
             console.log(err)
             res.send({err: err})
         }
-        if (results.length === 0) {
-            res.send({err: 'No results.'})
-        } else {
-            res.send({payload: results})
-        }
+
+        getAdItemsForAds(req, res, results, (err2, results2, fields2) => {
+            res.send(addAdItemsToAd(results2, results))
+        })
 
     })
+}
+
+function getAdItemsForAds (req, res, ads, cb) {
+    var adIds = []
+
+    for (var i = 0; i < ads.length; i++) {
+        adIds.push(ads[i].adid)
+    }
+
+    var query = "SELECT aditems.aditemid, aditems.userid, aditems.adid, aditems.price FROM aditems WHERE adid IN (" + adIds.join(',') + ")"
+
+    req.service.mysql.query({
+        sql: query,
+    }, (err, results, fields) => {
+        if (err) {
+            cb(err, results, fields)
+            return
+        }
+
+        cb(null, results, fields)
+
+    })
+}
+
+function addAdItemsToAd (aditems, ads) {
+    var p = []
+
+    for (var i = 0; i < ads.length; i++) {
+        var ad = ads[i]
+
+        ad.aditems = []
+
+        for (var j = 0; j < aditems.length; j++) {
+            if (aditems[j].adid === ad.adid)
+                ad.aditems.push(aditems[j])
+        }
+
+        p.push(ad)
+    }
+    return p
 }
 
 function newAd (req, res) {
