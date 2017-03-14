@@ -8,7 +8,7 @@ let express     = require('express'), // vi benytter express som rammeverk for �
     config      = require('./config.js'), // brukes for å håndtere mysql-tilgang
     mysql       = require('mysql'), // bibliotek for mysql
     bcrypt      = require('bcrypt'), // bibliotek for passord-hashing
-    connection  = mysql.createConnection(config.mysql) // lager tilkobling til mysql-databasen
+    connection  = mysql.createConnection(config.mysql) // lager tilkobling til mysql-databasen TODO: fase ut
 
 /* Registrerer filer i 'filepath' slik at de kan benyttes som endepunkter av APIet */
 function registerEndpoint(app, routePath, filePath) {
@@ -56,9 +56,5 @@ fs.readdirSync('./api').filter(f=>f.endsWith('.js') && !f.startsWith('_')).sort(
 var server = app.listen(process.env.PORT, function (){
     console.log('Boknaden API v' + process.env.VERSION + ' Port: ' + process.env.PORT)
     let environment = (parseInt(process.env.DEBUG)===1) ? "Development" : "Production"
-    console.log({
-        0: "Environment: ",
-        1: environment,
-        2: '-'
-    })
+    console.log("Environment: " + environment)
 })

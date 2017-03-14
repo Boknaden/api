@@ -1,4 +1,5 @@
-var shared = require('./_shared.js')
+var shared  = require('./_shared.js'),
+    Ad      = require('../models.js').ad
 
 function getAds (req, res) {
     var q           = req.query,
@@ -9,15 +10,9 @@ function getAds (req, res) {
         sort        = q.sort || 'DESC',
         offset      = (page - 1) * limit,
         vals        = [],
-        query       = "SELECT adid, userid, universityid, adname, createddate, updateddate FROM ads "
-    query    += ((typeof course !== 'undefined') ? "WHERE CourseID = ? " : "")
-    query    += ((typeof university !== 'undefined') ?
-                    ((typeof course !== 'undefined') ?
-                        "AND UniversityID = ? "
-                        : "WHERE UniversityID = ? ")
-                : "")
-    query    += "ORDER BY CreatedDate " + sort + " "
-    query    += "LIMIT " + offset + "," + limit + " "
+    //     query       = "SELECT ads.adid, users.username, ads.userid, ads.universityid, ads.adname, ads.createddate, ads.updateddate FROM ads INNER JOIN users ON (ads.userid = users.userid) "
+    // query    += "ORDER BY CreatedDate " + sort + " "
+    // query    += "LIMIT " + offset + "," + limit + " "
 
     if (course !== 'undefined') {
         vals.push(course)
@@ -50,7 +45,7 @@ function getAdItemsForAds (req, res, ads, cb) {
         adIds.push(ads[i].adid)
     }
 
-    var query = "SELECT aditems.aditemid, users.username, aditems.adid, aditems.text, aditems.description, aditems.price FROM aditems INNER JOIN users ON ( users.userid = aditems.userid AND adid IN (" + adIds.join(',') + ") )"
+    var query = "SELECT aditems.aditemid, aditems.adid, aditems.text, aditems.description, aditems.price FROM aditems WHERE adid IN (" + adIds.join(',') + ")"
 
     req.service.mysql.query({
         sql: query,
