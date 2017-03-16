@@ -1,5 +1,17 @@
 API for Boknaden
 ==============
+
+## Om
+
+Boknaden APIet kjører på NodeJS og benytter SSL for sikker kommunikasjon, samt JWT for autentisering.
+
+### Endpoints
+
+```javascript
+//her kommer det sikkert litt om endpoints
+```
+
+## Brukerveiledning
 For å kjøre APIet kreves [`NodeJS runtime versjon 6.10.0`](https://nodejs.org) og lokal MySQL database (Apache/Wamp på Windows funker), andre typer databaser støttes gjennom [Sequelize](http://docs.sequelizejs.com/en/v3/).
 
 *Anbefaler å benytte terminal/command-line for å laste ned github-prosjektet, hvis du benytter GitHub for Windows (GUI) hopp til steg 5.*
@@ -23,7 +35,8 @@ module.exports = {
         database: 'NAVN_PÅ_DATABASE',
     },
     security: {
-        secret: 'SIGNERINGSNØKKEL_FOR_JWT'
+        secret: 'SIGNERINGSNØKKEL_FOR_JWT',
+        tokenExpiration: '48h', // token er gyldig i 48 timer
     }
 }
 ```
@@ -36,8 +49,10 @@ PORT=ÅPEN_PORT_DEFAULT_57483
 DEBUG=1
 INTERNAL_IP=localhost
 VERBOSE=1
+SSL=0
 ```
 
+- *(Note)* SSL benyttes kun på produksjon, og er ikke nødvendig å sette på (1) for testing
 - `cd tools` for å få tilgang til boknadens verktøy.
 - `node sync.js` for å laste inn tabellene til databasen (dette avhenger av at du har satt opp databasen riktig).
 - *(Valgfritt)* Installer `nodemon`, kjør `npm install -g nodemon` for debugging.

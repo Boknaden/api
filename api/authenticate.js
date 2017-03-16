@@ -35,7 +35,7 @@ function authenticate (req, res) {
                 }
 
                 var token = req.service.jwt.sign(user.dataValues, req.boknaden.config.security.secret, {
-                    expiresIn: '36h'
+                    expiresIn: req.boknaden.config.security.tokenExpiration,
                 })
 
                 res.json({
