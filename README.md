@@ -1,15 +1,17 @@
-# API for Boknaden
+API for Boknaden
+==============
+For å kjøre APIet kreves [`NodeJS runtime versjon 6.10.0`](https://nodejs.org) og lokal MySQL database (Apache/Wamp på Windows funker), andre typer databaser støttes gjennom [Sequelize](http://docs.sequelizejs.com/en/v3/).
 
-For å kjøre APIet kreves [`NodeJS runtime versjon 6.10.0`](https://nodejs.org) og lokal MySQL database (Apache/Wamp på Windows funker).
+*Anbefaler å benytte terminal/command-line for å laste ned github-prosjektet, hvis du benytter GitHub for Windows (GUI) hopp til steg 5.*
+*Windows PowerShell/Terminal må benyttes etter steg 4.*
 
-**Windows PowerShell/Terminal må benyttes etter steg 4**
-
-1. (Anbefaler å benytte terminal/command-line, **hvis ikke hopp til steg 5**) Åpne Terminal (mac/linux) eller Windows PowerShell (win).
-2. Endre aktiv mappe `cd /mappe/til/github` ^^(mac/linux) eller `cd \mappe\til\github` ^^(win).
-3. `git clone https://github.com/Boknaden/api.git`
-4. Installer [nodejs](https://nodejs.org). [Alternativ installasjonsinformasjon for linux/mac](https://github.com/nodejs/node).
-5. Sjekk at installasjonen var vellykket ved kommandoen `node -v` (Output: `v6.10.0`).
-6. Opprett config.js i rotmappen av prosjektet (samme mappe som server.js), og fyll ut på følgende måte
+- Åpne Terminal (mac/linux) eller Windows PowerShell (win).
+- *(Valgfritt)* Endre aktiv mappe `cd /mappe/til/github` (mac/linux) eller `cd \mappe\til\github` (win).
+- *(Valgfritt)* `git clone https://github.com/Boknaden/api.git`.
+-  Installer [nodejs](https://nodejs.org). [Alternativ installasjonsinformasjon for linux/mac](https://github.com/nodejs/node).
+- Sjekk at installasjonen var vellykket ved kommandoen `node -v` (Output: `v6.10.0`).
+- `cd` til rotmappen hvor APIet befinner seg (samme mappe som server.js) og kjør `npm install` for å installere bibliotek.
+- Opprett `config.js` i rotmappen av prosjektet, og fyll ut på følgende måte (endre der det er blokkbokstaver):
 
 ```javascript
 module.exports = {
@@ -26,6 +28,8 @@ module.exports = {
 }
 ```
 
-7. `cd tools` for å få tilgang til boknadens verktøy
-8. `node sync.js` for å laste inn tabellene til databasen
-9. 
+- `cd tools` for å få tilgang til boknadens verktøy.
+- `node sync.js` for å laste inn tabellene til databasen.
+- *(Valgfritt)* Installer `nodemon` - `npm install -g nodemon`.
+- *(Valgfritt)* Hvis du installerte `nodemon` - `nodemon server.js`.
+- Hvis du ikke installerte nodemon, kjør `node server.js` fra rotmappen.
