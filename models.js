@@ -7,7 +7,8 @@ var Sequelize = require('sequelize'),
 var User = sequelize.define('user', {
     userid: {
         type: Sequelize.INTEGER,
-        primaryKey: true
+        autoIncrement: true,
+        primaryKey: true,
     },
     courseid: { type: Sequelize.INTEGER, allowNull: false },
     universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
@@ -28,7 +29,7 @@ var Ad = sequelize.define('ad', {
     adid: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
-        primaryKey: true
+        primaryKey: true,
     },
     userid: { type: Sequelize.INTEGER, allowNull: false },
     universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
