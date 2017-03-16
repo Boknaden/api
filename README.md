@@ -21,9 +21,11 @@ module.exports = {
         database: 'NAVN_PÅ_DATABASE',
     },
     security: {
-        secret: 'boknadensigneringsnokkel'
+        secret: 'SIGNERINGSNØKKEL_FOR_JWT'
     }
 }
 ```
 
-7.
+7. `cd tools` for å få tilgang til boknadens verktøy
+8. `node sync.js` for å laste inn tabellene til databasen
+9. 
