@@ -16,8 +16,30 @@ function registerEndpoint(app, routePath, filePath) {
     const methods = ['get', 'post', 'put', 'delete'] // alle http metoder som støttes
     const router = new express.Router() // express router for å rute forespørsler basert på URI
     const el = require(filePath) // laster inn filen som skal registreres som endepunkt
-    if (typeof el.register === 'function') {
-        el.register(router)
+    if (el.hasOwnProperty('requiresAuth')) { // middleware for å sjekke jwts
+        router.use(function (req, res, next) {
+            if (!el.requiresAuth[req.method]) { // dersom endepunktet brukeren forsøker å nå ikke krever autentisering
+                next() // kjører endepunktet
+                return
+            }
+
+            var token = req.body.token || req.query.token || req.headers['boknaden-verify'] // token kan sendes på flere måter, querystring, post body, header
+
+            if (token) {
+                jwt.verify(token, config.security.secret, function (err, verified_token) {
+                    if (err) {
+                        return res.json({success: false, message: 'Couldn\'t verify token.'}) // token har blitt harselert med
+                    }
+                    req.decoded = verified_token
+                    next()
+                })
+            } else { // dersom token ikke er supplert og endepunktet krever det
+                return res.status(403).send({
+                    success: false,
+                    message: 'This endpoint to Boknaden requires authentication.'
+                });
+            }
+        })
     }
     // går igjennom alle http metodene som finnes i filen som registreres som endepunkt
     // og kobler sammen

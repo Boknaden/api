@@ -65,4 +65,8 @@ function newUser (req, res) {
 module.exports = {
     get: getUsers,
     post: newUser,
+    requiresAuth: {
+        'GET': false,
+        'POST': false,
+    }
 }

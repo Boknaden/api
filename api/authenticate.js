@@ -58,4 +58,7 @@ function authenticate (req, res) {
 
 module.exports = {
     post: authenticate,
+    requiresAuth: {
+        'post': false,
+    }
 }

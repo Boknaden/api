@@ -52,11 +52,15 @@ function newCourse (req, res) {
     //     res.send({payload: results})
     // })
 
-    res.send({payload: 'Not implemented'})
+    res.status(404).send({success: false, message: 'Not implemented'})
 
 }
 
 module.exports = {
     get: getCourses,
     post: newCourse,
+    requiresAuth: {
+        'GET': false,
+        'POST': true,
+    }
 }

@@ -132,4 +132,8 @@ function newAdItem (req, res) {
 module.exports = {
     get: getAds,
     post: newAd,
+    requiresAuth: {
+        'GET': false,
+        'POST': true,
+    }
 }
