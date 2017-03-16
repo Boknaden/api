@@ -28,8 +28,23 @@ module.exports = {
 }
 ```
 
+- Opprett `.env` i rotmappen av prosjektet, og fyll ut på følgende måte (endre der det er blokkbokstaver):
+
+```
+VERSION=0.0.3
+PORT=ÅPEN_PORT_DEFAULT_57483
+DEBUG=1
+INTERNAL_IP=localhost
+VERBOSE=1
+```
+
 - `cd tools` for å få tilgang til boknadens verktøy.
-- `node sync.js` for å laste inn tabellene til databasen.
-- *(Valgfritt)* Installer `nodemon` - `npm install -g nodemon`.
-- *(Valgfritt)* Hvis du installerte `nodemon` - `nodemon server.js`.
+- `node sync.js` for å laste inn tabellene til databasen (dette avhenger av at du har satt opp databasen riktig).
+- *(Valgfritt)* Installer `nodemon`, kjør `npm install -g nodemon` for debugging.
+- *(Valgfritt)* Hvis du installerte `nodemon`, kjør `nodemon server.js`.
 - Hvis du ikke installerte nodemon, kjør `node server.js` fra rotmappen.
+- APIet kan nå nås på http://localhost:PORT_DU_VALGTE_OVER/ENDEPUNKT
+
+###Ekstra
+
+Endepunktene finner du i `/api/`-mappen. (ping.js = localhost:57483/ping)
