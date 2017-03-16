@@ -9,15 +9,15 @@ var User = sequelize.define('user', {
         type: Sequelize.INTEGER,
         primaryKey: true
     },
-    courseid: Sequelize.INTEGER,
-    universityid: Sequelize.INTEGER,
-    username: Sequelize.STRING(20),
-    passphrase: Sequelize.STRING(255),
-    email: Sequelize.STRING(255),
-    firstname: Sequelize.STRING(50),
-    lastname: Sequelize.STRING(50),
+    courseid: { type: Sequelize.INTEGER, allowNull: false },
+    universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
+    username: { type: Sequelize.STRING(20), allowNull: false },
+    passphrase: { type: Sequelize.STRING(255), allowNull: false },
+    email: { type: Sequelize.STRING(255), allowNull: false },
+    firstname: { type: Sequelize.STRING(50), allowNull: false },
+    lastname: { type: Sequelize.STRING(50), allowNull: false },
     lastlogin: Sequelize.DATE,
-    isadmin: Sequelize.INTEGER,
+    isadmin: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -30,10 +30,10 @@ var Ad = sequelize.define('ad', {
         autoIncrement: true,
         primaryKey: true
     },
-    userid: Sequelize.INTEGER,
-    universityid: Sequelize.INTEGER,
-    courseid: Sequelize.INTEGER,
-    adname: Sequelize.STRING(100),
+    userid: { type: Sequelize.INTEGER, allowNull: false },
+    universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
+    courseid: { type: Sequelize.INTEGER, allowNull: false },
+    adname: { type: Sequelize.STRING(100), allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -46,12 +46,13 @@ var AdItem = sequelize.define('aditem', {
         autoIncrement: true,
         primaryKey: true
     },
-    userid: Sequelize.INTEGER,
-    adid: Sequelize.INTEGER,
-    imageid: Sequelize.INTEGER,
-    price: Sequelize.FLOAT,
-    text: Sequelize.TEXT,
-    description: Sequelize.TEXT,
+    userid: { type: Sequelize.INTEGER, allowNull: false },
+    adid: { type: Sequelize.INTEGER, allowNull: false },
+    imageid: { type: Sequelize.INTEGER, allowNull: true },
+    price: { type: Sequelize.FLOAT, allowNull: false },
+    text: { type: Sequelize.TEXT, allowNull: false },
+    description: { type: Sequelize.TEXT, allowNull: true },
+    isbn: { type: Sequelize.INTEGER(13), allowNull: true },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -64,8 +65,8 @@ var Course = sequelize.define('course', {
         autoIncrement: true,
         primaryKey: true
     },
-    coursename: Sequelize.STRING(60),
-    universityid: Sequelize.INTEGER,
+    coursename: { type: Sequelize.STRING(60), allowNull: false },
+    universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -78,9 +79,9 @@ var University = sequelize.define('university', {
         autoIncrement: true,
         primaryKey: true
     },
-    universityname: Sequelize.STRING(60),
-    longitude: Sequelize.FLOAT,
-    latitude: Sequelize.FLOAT,
+    universityname: { type: Sequelize.STRING(60), allowNull: false },
+    longitude: { type: Sequelize.FLOAT, allowNull: false },
+    latitude: { type: Sequelize.FLOAT, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -93,28 +94,64 @@ var Image = sequelize.define('image', {
         autoIncrement: true,
         primaryKey: true
     },
-    userid: Sequelize.INTEGER,
-    imageurl: Sequelize.STRING(255),
-    title: Sequelize.STRING(30),
-    description: Sequelize.TEXT,
+    userid: { type: Sequelize.INTEGER, allowNull: false },
+    imageurl: { type: Sequelize.STRING(255), allowNull: false },
+    title: { type: Sequelize.STRING(30), allowNull: false },
+    description: { type: Sequelize.TEXT, allowNull: true },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
     tableName: 'images',
 })
 
+var Chat = sequelize.define('chat', {
+    chatid: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    initiatorid: { type: Sequelize.INTEGER, allowNull: false },
+    recipientid: { type: Sequelize.INTEGER, allowNull: false },
+}, {
+    createdAt: 'createddate',
+    updatedAt: 'updateddate',
+    tableName: 'chats',
+})
+
+var ChatMessage = sequelize.define('chatmessage', {
+    chatmessageid: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    userid: { type: Sequelize.INTEGER, allowNull: false },
+    chatid: { type: Sequelize.INTEGER, allowNull: false },
+    message: { type: Sequelize.TEXT, allowNull: false },
+    imageid: { type: Sequelize.INTEGER, allowNull: true },
+}, {
+    createdAt: 'createddate',
+    updatedAt: 'updateddate',
+    tableName: 'chatmessages',
+})
+
 User.hasMany(Ad, { foreignKey: 'userid' })
 User.hasMany(AdItem, { foreignKey: 'userid' })
 User.hasMany(Image, { foreignKey: 'userid' })
+User.belongsTo(Course, { foreignKey: 'courseid' })
+
+University.hasMany(Ad, { foreignKey: 'universityid' })
 
 Course.hasMany(User, { foreignKey: 'courseid' })
+Course.hasMany(Ad, { foreignKey: 'courseid' })
 
-User.belongsTo(Course, { foreignKey: 'courseid' })
 Ad.belongsTo(User, { foreignKey: 'userid' })
+Ad.belongsTo(Course, { foreignKey: 'courseid' })
+Ad.belongsTo(University, { foreignKey: 'universityid' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
 Image.belongsTo(User, { foreignKey: 'userid' })
 
 module.exports = {
+    sequelize: sequelize,
     user: User,
     ad: Ad,
     aditem: AdItem,

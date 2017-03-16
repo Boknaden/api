@@ -5,7 +5,10 @@ function getUsers (req, res) {
     User.findAll({
         attributes: ["userid", "username", "email", "firstname", "lastname"]
     }).then(function (users) {
-        res.send({payload: users})
+        res.json(users)
+    }).catch(function (err) {
+        console.log(err)
+        res.status(404).send({err: 'An error happened'})
     })
 }
 
@@ -15,11 +18,9 @@ function newUser (req, res) {
     var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
 
     if (!valuesNotEmpty) {
-        res.send({err: 'Not all parameters specified.'})
+        res.json({err: 'Not all parameters specified.'})
         return
     }
-
-    var passHash = req.service.bcrypt.hashSync(req.body.passphrase, 10)
 
     User.find({
         where: {
@@ -31,20 +32,32 @@ function newUser (req, res) {
     }).then(function (user) {
 
         if (!user) {
-            User.create({
-                username: req.body.username.trim(),
-                passphrase: passHash,
-                email: req.body.email.trim(),
-                firstname: req.body.firstname.trim(),
-                lastname: req.body.lastname.trim(),
-                courseid: parseInt(req.body.courseid)
-            }).then(function (user) {
-                res.send({payload: user})
+            var passHash = req.service.bcrypt.hash(req.body.passphrase, 10, function (err, hash) {
+
+                if (err) {
+                    console.log(err)
+                    res.json({err: 'An error happened while hashing.'})
+                    return
+                }
+
+                User.create({
+                    username: req.body.username.trim(),
+                    passphrase: passHash,
+                    email: req.body.email.trim(),
+                    firstname: req.body.firstname.trim(),
+                    lastname: req.body.lastname.trim(),
+                    courseid: parseInt(req.body.courseid)
+                }).then(function (user) {
+                    res.json(user)
+                })
             })
         } else {
-            res.send({err: "Username or email already taken."})
+            res.json({err: "Username or email already taken."})
         }
 
+    }).catch(function (err) {
+        console.log(err)
+        res.status(404).json({err: 'An error happened'})
     })
 
 }

@@ -8,7 +8,8 @@ let express     = require('express'), // vi benytter express som rammeverk for �
     config      = require('./config.js'), // brukes for å håndtere mysql-tilgang
     mysql       = require('mysql'), // bibliotek for mysql
     bcrypt      = require('bcrypt'), // bibliotek for passord-hashing
-    connection  = mysql.createConnection(config.mysql) // lager tilkobling til mysql-databasen TODO: fase ut
+    connection  = mysql.createConnection(config.mysql), // lager tilkobling til mysql-databasen TODO: fase ut
+    jwt         = require('jsonwebtoken') // benyttes for å verifisere at et api-kall er autentisert
 
 /* Registrerer filer i 'filepath' slik at de kan benyttes som endepunkter av APIet */
 function registerEndpoint(app, routePath, filePath) {
@@ -36,7 +37,9 @@ function registerDependencies (req, res, next) {
     req.service = {
         mysql: connection,
         bcrypt: bcrypt,
+        jwt: jwt,
     }
+    req.boknaden = {config: config}
     next()
 }
 

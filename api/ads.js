@@ -1,62 +1,54 @@
 var shared  = require('./_shared.js'),
-    Ad      = require('../models.js').ad
+    models  = require('../models.js'),
+    Ad      = models.ad,
+    AdItem  = models.aditem,
+    User    = models.user
 
 function getAds (req, res) {
     var q           = req.query,
         course      = parseInt(q.course) || undefined,
         university  = parseInt(q.university) || undefined,
-        limit       = parseInt(q.limit) || 10,
+        limit       = parseInt(q.limit) || 20,
         page        = parseInt(q.page) || 1,
-        sort        = q.sort || 'DESC',
-        offset      = (page - 1) * limit,
-        vals        = [],
-    //     query       = "SELECT ads.adid, users.username, ads.userid, ads.universityid, ads.adname, ads.createddate, ads.updateddate FROM ads INNER JOIN users ON (ads.userid = users.userid) "
-    // query    += "ORDER BY CreatedDate " + sort + " "
-    // query    += "LIMIT " + offset + "," + limit + " "
+        offset      = (page - 1) * limit
 
-    if (course !== 'undefined') {
-        vals.push(course)
-    }
-
-    if (university !== 'undefined') {
-        vals.push(university)
-    }
-
-    req.service.mysql.query({
-        sql: query,
-        values: vals,
-    }, (err, results, fields) => {
-        if (err) {
-            console.log(err)
-            res.send({data: req.body})
+    Ad.findAll({
+        limit: limit,
+        offset: offset,
+        include: [User],
+        order: 'createddate DESC'
+    }).then(function (ads) {
+        var payload = {
+            page: page,
+            limit: limit,
+            offset: offset,
+            ads: ads
         }
-
-        getAdItemsForAds(req, res, results, (err2, results2, fields2) => {
-            res.send(addAdItemsToAd(results2, results))
-        })
-
+        res.json(payload)
+    }).catch(function (err) {
+        console.log(err)
+        res.status(404).send({err: 'An error happened'})
     })
 }
 
-function getAdItemsForAds (req, res, ads, cb) {
+function getAdItemsForAds (ads, cb) {
     var adIds = []
 
     for (var i = 0; i < ads.length; i++) {
         adIds.push(ads[i].adid)
     }
 
-    var query = "SELECT aditems.aditemid, aditems.adid, aditems.text, aditems.description, aditems.price FROM aditems WHERE adid IN (" + adIds.join(',') + ")"
-
-    req.service.mysql.query({
-        sql: query,
-    }, (err, results, fields) => {
-        if (err) {
-            cb(err, results, fields)
-            return
+    AdItem.findAll({
+        where: {
+            adid: {
+                $in: adIds
+            }
         }
-
-        cb(null, results, fields)
-
+    }).then(function (aditems) {
+        cb(aditems)
+    }).catch(function (err) {
+        console.log(err)
+        res.json({err: 'An error happened'})
     })
 }
 
@@ -83,8 +75,7 @@ function newAd (req, res) {
         fields          = ["userid", "courseid", "adname"],
         user            = parseInt(q.userid),
         course          = parseInt(q.courseid),
-        valuesNotEmpty  = shared.checkEmptyValues(q, fields),
-        query           = "INSERT INTO ads ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
+        valuesNotEmpty  = shared.checkEmptyValues(q, fields)
 
     if (q.hasOwnProperty('adid')) {
         newAdItem(req, res)
@@ -96,47 +87,45 @@ function newAd (req, res) {
         return
     }
 
-    req.service.mysql.query({
-        sql: query,
-        timeout: 10000,
-        values: [user, university, q.adname.trim()],
-    }, function (err, results, fields) {
-        if (err) {
-            console.log(err)
-            res.status(404).send({data: req.body})
-            return
-        }
-        res.send({insertid: results.insertId})
+    Ad.create({
+        userid: user,
+        courseid: course,
+        adname: q.adname.trim(),
+    }).then(function (ad) {
+        res.json({data: q, ad: ad})
+    }).catch(function (err) {
+        console.log(err)
+        res.status(404).send({err: 'An error happened'})
     })
 }
 
 function newAdItem (req, res) {
     var q               = req.body,
         description     = q.description || null
-        fields          = ["userid", "adid", "text", "description", "price"],
+        fields          = ["userid", "adid", "text", "price"],
         user            = parseInt(q.userid),
         adid            = parseInt(q.adid),
         price           = parseInt(q.price),
-        valuesNotEmpty  = shared.checkEmptyValues(q, fields),
-        query           = "INSERT INTO aditems ("+ fields.join(',') +") VALUES ("+ shared.genQuestionMarks(fields) +")"
+        valuesNotEmpty  = shared.checkEmptyValues(q, fields)
 
-        if (!valuesNotEmpty) {
-            res.status(404).send({err: 'Not all parameters specified.'})
-            return
-        }
+    if (!valuesNotEmpty) {
+        res.status(404).send({err: 'Not all parameters specified.'})
+        return
+    }
 
-        req.service.mysql.query({
-            sql: query,
-            timeout: 10000,
-            values: [user, adid, q.text.trim(), description, price],
-        }, function (err, results, fields) {
-            if (err) {
-                console.log(err)
-                res.send({data: req.body})
-                return
-            }
-            res.send({insertid: results.insertId})
-        })
+    AdItem.create({
+        user: user,
+        description: description,
+        adid: adid,
+        price: price,
+        text: q.text.trim(),
+        description: description,
+    }).then(function (aditem) {
+        res.json(aditem)
+    }).catch(function (err) {
+        console.log(err)
+        res.status(404).send({err: 'An error happened'})
+    })
 
 }
 

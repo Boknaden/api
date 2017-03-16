@@ -32,6 +32,22 @@ function checkEmptyValues (values, fields) {
     return true
 }
 
+function arrObjPropToList (values, needle) {
+    var arr = [],
+        values = values || undefined
+
+    if (values && typeof(values) === 'array') {
+        for (var i = 0; i < values.length; i++) {
+            if (values[i].hasOwnProperty(needle)) {
+                arr.push(values[i][needle])
+            }
+        }
+    }
+
+    return arr
+
+}
+
 module.exports = {
     genQuestionMarks: genQuestionMarks,
     checkEmptyValues: checkEmptyValues
