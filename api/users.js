@@ -42,7 +42,7 @@ function newUser (req, res) {
 
                 User.create({
                     username: req.body.username.trim(),
-                    passphrase: passHash,
+                    passphrase: hash,
                     email: req.body.email.trim(),
                     firstname: req.body.firstname.trim(),
                     lastname: req.body.lastname.trim(),
