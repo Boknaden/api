@@ -16,7 +16,8 @@ function registerEndpoint(app, routePath, filePath) {
     const methods = ['get', 'post', 'put', 'delete'] // alle http metoder som støttes
     const router = new express.Router() // express router for å rute forespørsler basert på URI
     const el = require(filePath) // laster inn filen som skal registreres som endepunkt
-    if (el.hasOwnProperty('requiresAuth') && (process.env.DEBUG === 0)) { // middleware for å sjekke jwts
+
+    if (el.hasOwnProperty('requiresAuth') && (parseInt(process.env.DEBUG) === 0)) { // middleware for å sjekke jwts
         router.use(function (req, res, next) {
             if (!el.requiresAuth[req.method]) { // dersom endepunktet brukeren forsøker å nå ikke krever autentisering
                 next() // kjører endepunktet
@@ -41,6 +42,7 @@ function registerEndpoint(app, routePath, filePath) {
             }
         })
     }
+
     // går igjennom alle http metodene som finnes i filen som registreres som endepunkt
     // og kobler sammen
     methods.filter(method=>el[method]).forEach(method=> {
