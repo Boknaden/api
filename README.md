@@ -45,6 +45,6 @@ VERBOSE=1
 - Hvis du ikke installerte nodemon, kjør `node server.js` fra rotmappen.
 - APIet kan nå nås på http://localhost:PORT_DU_VALGTE_OVER/ENDEPUNKT
 
-###Ekstra
+### Ekstra
 
 Endepunktene finner du i `/api/`-mappen. (ping.js = localhost:57483/ping)
