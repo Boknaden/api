@@ -29,7 +29,7 @@ function registerEndpoint(app, routePath, filePath) {
                     if (err) {
                         return res.json({success: false, message: 'Couldn\'t verify token.'}) // token har blitt harselert med
                     }
-                    req.decoded = verified_token
+                    req.user_token = verified_token
                     next()
                 })
             } else { // dersom token ikke er supplert og endepunktet krever det

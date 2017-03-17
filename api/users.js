@@ -32,7 +32,7 @@ function newUser (req, res) {
     }).then(function (user) {
 
         if (!user) {
-            var passHash = req.service.bcrypt.hash(req.body.passphrase, 10, function (err, hash) {
+            var passHash = req.service.bcrypt.hash(req.body.passphrase, req.boknaden.config.security.saltRounds, function (err, hash) {
 
                 if (err) {
                     console.log(err)
