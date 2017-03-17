@@ -53,7 +53,7 @@ var AdItem = sequelize.define('aditem', {
     price: { type: Sequelize.FLOAT, allowNull: false },
     text: { type: Sequelize.TEXT, allowNull: false },
     description: { type: Sequelize.TEXT, allowNull: true },
-    isbn: { type: Sequelize.INTEGER(13), allowNull: true },
+    isbn: { type: Sequelize.INTEGER(13), allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',

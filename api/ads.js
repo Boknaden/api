@@ -80,10 +80,10 @@ function newAd (req, res) {
 function newAdItem (req, res) {
     var q               = req.body,
         description     = q.description || null
-        fields          = ["adid", "text", "price"],
-        user            = parseInt(q.userid),
+        fields          = ["adid", "text", "price", "isbn"],
         adid            = parseInt(q.adid),
         price           = parseInt(q.price),
+        isbn            = parseInt(q.isbn)
         valuesNotEmpty  = shared.checkEmptyValues(q, fields)
 
     if (!valuesNotEmpty) {
@@ -98,6 +98,7 @@ function newAdItem (req, res) {
         price: price,
         text: q.text.trim(),
         description: description,
+        isbn: isbn,
     }).then(function (aditem) {
         res.json(aditem)
     }).catch(function (err) {
