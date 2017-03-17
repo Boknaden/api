@@ -6,9 +6,7 @@ let express     = require('express'), // vi benytter express som rammeverk for �
     helmet      = require('helmet'),
     bodyParser  = require('body-parser'),
     config      = require('./config.js'), // brukes for å håndtere mysql-tilgang
-    mysql       = require('mysql'), // bibliotek for mysql
     bcrypt      = require('bcrypt'), // bibliotek for passord-hashing
-    connection  = mysql.createConnection(config.mysql), // lager tilkobling til mysql-databasen TODO: fase ut
     jwt         = require('jsonwebtoken') // benyttes for å verifisere at et api-kall er autentisert
 
 /* Registrerer filer i 'filepath' slik at de kan benyttes som endepunkter av APIet */
@@ -59,7 +57,6 @@ app.use(registerDependencies)
 /* DRY metode for å gi oss tredjepartstjenester som mysql-tilgang og passordhashing */
 function registerDependencies (req, res, next) {
     req.service = {
-        mysql: connection,
         bcrypt: bcrypt,
         jwt: jwt,
     }
