@@ -94,8 +94,6 @@ function newAd (req, res) {
         course          = parseInt(q.courseid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields)
 
-    console.log(req.user_token)
-
     if (q.hasOwnProperty('adid')) {
         newAdItem(req, res)
         return
@@ -107,7 +105,7 @@ function newAd (req, res) {
     }
 
     Ad.create({
-        userid: user,
+        userid: req.user_token.userid,
         courseid: course,
         adname: q.adname.trim(),
     }).then(function (ad) {

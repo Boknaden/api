@@ -8,7 +8,7 @@ function authenticate (req, res) {
         passphrase   = req.body.passphrase
 
     User.findOne({
-        attributes: ["username", "passphrase", "firstname", "lastname", "email", "isadmin"],
+        attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin"],
         where: {
             $or: [
                 {username: username},
