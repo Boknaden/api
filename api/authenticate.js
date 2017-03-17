@@ -1,5 +1,6 @@
 var shared  = require('./_shared.js'),
     models  = require('../models.js'),
+    bcrypt  = require('bcrypt'),
     User    = models.user
 
 function authenticate (req, res) {
@@ -16,12 +17,12 @@ function authenticate (req, res) {
         }
     }).then(function (user) {
         if (user) {
-            req.service.bcrypt.compare(passphrase, user.passphrase, function (err, authed) {
+            bcrypt.compare(passphrase, user.passphrase, function (err, authed) {
                 if (err) {
                     console.log(err)
                     res.json({
                         success: false,
-                        message: 'An error happened (0).' // av sikkerhetsmessige grunner røper vi ikke hvilken del av nøklene som er feil
+                        message: 'An error happened (0).'
                     })
                     return
                 }

@@ -1,8 +1,10 @@
-var shared  = require('./_shared.js'),
-    models  = require('../models.js'),
-    Ad      = models.ad,
-    AdItem  = models.aditem,
-    User    = models.user
+var shared      = require('./_shared.js'),
+    models      = require('../models.js'),
+    Ad          = models.ad,
+    AdItem      = models.aditem,
+    User        = models.user,
+    Course      = models.course,
+    University  = models.university
 
 function getAds (req, res) {
     var q           = req.query,
@@ -12,17 +14,32 @@ function getAds (req, res) {
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit
 
-    Ad.findAll({
+    Ad.findAndCountAll({
         limit: limit,
         offset: offset,
-        include: [User],
-        order: 'createddate DESC'
+        order: 'createddate DESC',
+        include: [
+            {
+                model: User,
+                attributes: ['username', 'firstname', 'lastname'],
+            }, {
+                model: AdItem
+            }, {
+                model: Course,
+                attributes: ['courseid', 'coursename'],
+                include: [
+                    {
+                        model: University
+                    }
+                ]
+            }
+        ],
     }).then(function (ads) {
         var payload = {
-            page: page,
             limit: limit,
             offset: offset,
-            ads: ads
+            count: ads.count,
+            ads: ads.rows,
         }
         res.json(payload)
     }).catch(function (err) {
@@ -72,10 +89,12 @@ function addAdItemsToAd (aditems, ads) {
 
 function newAd (req, res) {
     var q               = req.body,
-        fields          = ["userid", "courseid", "adname"],
+        fields          = ["courseid", "adname"],
         user            = parseInt(q.userid),
         course          = parseInt(q.courseid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields)
+
+    console.log(req.user_token)
 
     if (q.hasOwnProperty('adid')) {
         newAdItem(req, res)

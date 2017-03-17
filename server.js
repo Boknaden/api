@@ -6,7 +6,6 @@ let express     = require('express'), // vi benytter express som rammeverk for �
     helmet      = require('helmet'),
     bodyParser  = require('body-parser'),
     config      = require('./config.js'), // brukes for å håndtere mysql-tilgang
-    bcrypt      = require('bcrypt'), // bibliotek for passord-hashing
     jwt         = require('jsonwebtoken') // benyttes for å verifisere at et api-kall er autentisert
 
 /* Registrerer filer i 'filepath' slik at de kan benyttes som endepunkter av APIet */
@@ -57,7 +56,6 @@ app.use(registerDependencies)
 /* DRY metode for å gi oss tredjepartstjenester som mysql-tilgang og passordhashing */
 function registerDependencies (req, res, next) {
     req.service = {
-        bcrypt: bcrypt,
         jwt: jwt,
     }
     req.boknaden = {config: config}
@@ -65,10 +63,12 @@ function registerDependencies (req, res, next) {
 }
 
 /* APIet svarer alltid med JSON, dette gjør så klienten vet at den mottar JSON */
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.set('Content-Type', 'application/json')
-    next()
-})
+    next();
+});
 
 /* Går igjennom alle filene under mappen "api" og registrerer disse som et endepunkt i APIet */
 fs.readdirSync('./api').filter(f=>f.endsWith('.js') && !f.startsWith('_')).sort().forEach(file => {

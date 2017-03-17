@@ -141,13 +141,17 @@ User.hasMany(Image, { foreignKey: 'userid' })
 User.belongsTo(Course, { foreignKey: 'courseid' })
 
 University.hasMany(Ad, { foreignKey: 'universityid' })
+University.hasMany(Course, { foreignKey: 'universityid' })
 
 Course.hasMany(User, { foreignKey: 'courseid' })
 Course.hasMany(Ad, { foreignKey: 'courseid' })
+Course.belongsTo(University, { foreignKey: 'universityid' })
 
+Ad.hasMany(AdItem, { foreignKey: 'adid' })
 Ad.belongsTo(User, { foreignKey: 'userid' })
 Ad.belongsTo(Course, { foreignKey: 'courseid' })
 Ad.belongsTo(University, { foreignKey: 'universityid' })
+AdItem.belongsTo(Ad, { foreignKey: 'adid' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
 Image.belongsTo(User, { foreignKey: 'userid' })
 
