@@ -48,45 +48,6 @@ function getAds (req, res) {
     })
 }
 
-function getAdItemsForAds (ads, cb) {
-    var adIds = []
-
-    for (var i = 0; i < ads.length; i++) {
-        adIds.push(ads[i].adid)
-    }
-
-    AdItem.findAll({
-        where: {
-            adid: {
-                $in: adIds
-            }
-        }
-    }).then(function (aditems) {
-        cb(aditems)
-    }).catch(function (err) {
-        console.log(err)
-        res.json({err: 'An error happened'})
-    })
-}
-
-function addAdItemsToAd (aditems, ads) {
-    var p = []
-
-    for (var i = 0; i < ads.length; i++) {
-        var ad = ads[i]
-
-        ad.aditems = []
-
-        for (var j = 0; j < aditems.length; j++) {
-            if (aditems[j].adid === ad.adid)
-                ad.aditems.push(aditems[j])
-        }
-
-        p.push(ad)
-    }
-    return p
-}
-
 function newAd (req, res) {
     var q               = req.body,
         fields          = ["courseid", "adname"],
@@ -119,7 +80,7 @@ function newAd (req, res) {
 function newAdItem (req, res) {
     var q               = req.body,
         description     = q.description || null
-        fields          = ["userid", "adid", "text", "price"],
+        fields          = ["adid", "text", "price"],
         user            = parseInt(q.userid),
         adid            = parseInt(q.adid),
         price           = parseInt(q.price),
@@ -131,7 +92,7 @@ function newAdItem (req, res) {
     }
 
     AdItem.create({
-        user: user,
+        userid: req.user_token.userid,
         description: description,
         adid: adid,
         price: price,
