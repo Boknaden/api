@@ -4,7 +4,8 @@ var shared      = require('./_shared.js'),
     AdItem      = models.aditem,
     User        = models.user,
     Course      = models.course,
-    University  = models.university
+    University  = models.university,
+    Image       = models.image
 
 function getAds (req, res) {
     var q           = req.query,
@@ -18,12 +19,18 @@ function getAds (req, res) {
         limit: limit,
         offset: offset,
         order: 'createddate DESC',
+        attributes: ["adname", "createddate", "updateddate"]
         include: [
             {
                 model: User,
                 attributes: ['username', 'firstname', 'lastname'],
             }, {
                 model: AdItem
+                include: [
+                    {
+                        model: Image
+                    }
+                ]
             }, {
                 model: Course,
                 attributes: ['courseid', 'coursename'],

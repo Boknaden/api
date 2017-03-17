@@ -153,7 +153,9 @@ Ad.belongsTo(Course, { foreignKey: 'courseid' })
 Ad.belongsTo(University, { foreignKey: 'universityid' })
 AdItem.belongsTo(Ad, { foreignKey: 'adid' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
+AdItem.belongsTo(Image, { foreignKey: 'imageid' })
 Image.belongsTo(User, { foreignKey: 'userid' })
+Image.hasMany(AdItem, { foreignKey: 'imageid' })
 
 module.exports = {
     sequelize: sequelize,
