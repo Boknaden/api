@@ -6,7 +6,9 @@ let express     = require('express'), // vi benytter express som rammeverk for �
     helmet      = require('helmet'),
     bodyParser  = require('body-parser'),
     config      = require('./config.js'), // brukes for 책 h책ndtere mysql-tilgang
-    jwt         = require('jsonwebtoken') // benyttes for 책 verifisere at et api-kall er autentisert
+    jwt         = require('jsonwebtoken'), // benyttes for 책 verifisere at et api-kall er autentisert
+    logger      = require('./tools/logger.js') // benyttes for 책 lagre meldinger generert av appen i database
+
 
 /* Registrerer filer i 'filepath' slik at de kan benyttes som endepunkter av APIet */
 function registerEndpoint(app, routePath, filePath) {

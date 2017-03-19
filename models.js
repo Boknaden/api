@@ -1,7 +1,9 @@
-var Sequelize = require('sequelize'),
+var logger    = require('./tools/logger.js'),
+    Sequelize = require('sequelize'),
     config    = require('./config.js'),
     sequelize = new Sequelize(config.mysql.database, config.mysql.user, config.mysql.password, {
-        port: config.mysql.port
+        port: config.mysql.port,
+        logging: false,
     })
 
 var User = sequelize.define('user', {
@@ -23,6 +25,21 @@ var User = sequelize.define('user', {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
     tableName: 'users',
+})
+
+var Log = sequelize.define('log', {
+    logid: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    loggedfrom: { type: Sequelize.STRING(255), allowNull: false },
+    message: { type: Sequelize.TEXT, allowNull: false },
+    state: { type: Sequelize.ENUM('info', 'error'), allowNull: false }
+}, {
+    createdAt: 'createddate',
+    updatedAt: 'updateddate',
+    tableName: 'logs',
 })
 
 var Ad = sequelize.define('ad', {
@@ -164,5 +181,6 @@ module.exports = {
     aditem: AdItem,
     course: Course,
     university: University,
-    image: Image
+    image: Image,
+    log: Log,
 }

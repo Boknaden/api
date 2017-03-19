@@ -1,11 +1,12 @@
 var shared  = require('./_shared.js'),
-    models  = require('../models.js'),
     bcrypt  = require('bcrypt'),
-    User    = models.user
+    User    = shared.models.user
 
 function authenticate (req, res) {
     var username     = req.body.username,
         passphrase   = req.body.passphrase
+
+    shared.logger.log('authenticate', 'From: ' + req.ip)
 
     User.findOne({
         attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin"],
@@ -52,6 +53,7 @@ function authenticate (req, res) {
             })
         }
     }).catch(function (err) {
+        shared.logger.log('authenticate', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
         res.json({err: 'Error happened while processing authentication'})
     })

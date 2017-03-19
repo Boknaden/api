@@ -1,5 +1,8 @@
 /* DRY (IGD: ikke gjenta deg) */
 
+var logger = require('../tools/logger.js'),
+    models = require('../models.js')
+
 function genQuestionMarks (fields) {
     var qmarks = ""
 
@@ -50,5 +53,7 @@ function arrObjPropToList (values, needle) {
 
 module.exports = {
     genQuestionMarks: genQuestionMarks,
-    checkEmptyValues: checkEmptyValues
+    checkEmptyValues: checkEmptyValues,
+    logger: logger,
+    models: models
 }

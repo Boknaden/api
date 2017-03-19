@@ -1,17 +1,13 @@
-var shared = require('./_shared')
+var shared      = require('./_shared'),
+    University  = shared.models.university
+
 function getUniversities (req, res) {
-    req.service.mysql.query(
-        'SELECT universityid, universityname, longitude, latitude, createddate FROM universities',
-        function (err, result, fields) {
-        if (err) {
-            res.send({err: err})
-            return
-        }
-        if (result.length === 0) {
-            res.send({err: 'No results.'})
-        } else {
-            res.send({payload: result})
-        }
+    shared.logger.log('getUniversities', 'From: ' + req.ip)
+    University.findAll()
+    .then(function (universities) {
+        res.json(universities)
+    }).catch(function (err) {
+        shared.logger.log('getUniversities', 'From: ' + req.ip + ". " + err, 'error')
     })
 }
 

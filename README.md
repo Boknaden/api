@@ -54,7 +54,7 @@ SSL=0
 ```
 
 - *(Note)* SSL benyttes kun på produksjon, og er ikke nødvendig å sette på (1) for testing
-- `cd tools` for å få tilgang til boknadens verktøy.
+- `cd tools/sync` for å få tilgang til databasesynkroniseringsverktøyet til boknaden.
 - `node sync.js` for å laste inn tabellene til databasen (dette avhenger av at du har satt opp databasen riktig).
 - *(Valgfritt)* Installer `nodemon`, kjør `npm install -g nodemon` for debugging.
 - *(Valgfritt)* Hvis du installerte `nodemon`, kjør `nodemon server.js`.

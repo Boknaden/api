@@ -1,7 +1,13 @@
-exports.get = function (req, res) {
-    if (parseInt(process.env.DEBUG) === 1) {
-        res.status(200).send({payload: 'Pong'})
-    } else {
-        res.status(404).send()
+function getPing (req, res) {
+    res.json({
+        success: true,
+        message: 'Pong!'
+    })
+}
+
+module.exports = {
+    get: getPing,
+    requiresAuth: {
+        'GET': false,
     }
 }

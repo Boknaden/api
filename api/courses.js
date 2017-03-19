@@ -1,32 +1,31 @@
-var shared = require('./_shared')
-function getCourses (req, res) {
+var shared      = require('./_shared'),
+    Course      = shared.models.course,
+    University  = shared.models.university
 
+function getCourses (req, res) {
     var query,
         universityid = parseInt(req.query.universityid) || false,
-        boundParams = []
+        findOpts = {
+            include: [
+                {
+                    model: University,
+                }
+            ],
+        }
+
+    shared.logger.log('getCourses', 'From: ' + req.ip)
 
     if (universityid) {
-        query = "SELECT courses.courseid, courses.coursename, universities.universityname, courses.universityid FROM courses INNER JOIN universities ON (courses.universityid = universities.universityid AND courses.universityid = ?)"
-        boundParams.push(universityid)
-    } else {
-        query = 'SELECT courses.courseid, courses.coursename, universities.universityname, courses.universityid FROM courses INNER JOIN universities ON (courses.universityid = universities.universityid)'
+        findOpts.where = {
+            'universityid': universityid
+        }
     }
 
-    req.service.mysql.query({
-        sql: query,
-        timeout: 10000,
-        values: boundParams
-    }, function (err, result, fields) {
-        if (err) {
-            console.log(err)
-            res.send({data: req.body})
-            return
-        }
-        if (result.length === 0) {
-            res.send({err: 'No results.'})
-        } else {
-            res.send({payload: result})
-        }
+    Course.findAll(findOpts)
+    .then(function (courses) {
+        res.json(courses)
+    }).catch(function (err) {
+        shared.logger.log('getCourses', 'From: ' + ip + '. ' + err, 'error')
     })
 }
 
@@ -51,6 +50,8 @@ function newCourse (req, res) {
     //     }
     //     res.send({payload: results})
     // })
+
+    shared.logger.log('newCourse', 'From: ' + req.ip + ". Not implemented.")
 
     res.status(404).send({success: false, message: 'Not implemented'})
 

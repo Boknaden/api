@@ -1,11 +1,10 @@
 var shared      = require('./_shared.js'),
-    models      = require('../models.js'),
-    Ad          = models.ad,
-    AdItem      = models.aditem,
-    User        = models.user,
-    Course      = models.course,
-    University  = models.university,
-    Image       = models.image
+    Ad          = shared.models.ad,
+    AdItem      = shared.models.aditem,
+    User        = shared.models.user,
+    Course      = shared.models.course,
+    University  = shared.models.university,
+    Image       = shared.models.image
 
 function getAds (req, res) {
     var q           = req.query,
@@ -15,17 +14,18 @@ function getAds (req, res) {
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit
 
+    shared.logger.log('getAds', 'From: ' + req.ip)
+
     Ad.findAndCountAll({
         limit: limit,
         offset: offset,
         order: 'createddate DESC',
-        attributes: ["adname", "createddate", "updateddate"]
         include: [
             {
                 model: User,
                 attributes: ['username', 'firstname', 'lastname'],
             }, {
-                model: AdItem
+                model: AdItem,
                 include: [
                     {
                         model: Image
@@ -50,6 +50,7 @@ function getAds (req, res) {
         }
         res.json(payload)
     }).catch(function (err) {
+        shared.logger.log('getAds', 'From: ' + ip + '. ' + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
@@ -61,6 +62,8 @@ function newAd (req, res) {
         user            = parseInt(q.userid),
         course          = parseInt(q.courseid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields)
+
+    shared.logger.log('newAd', 'From: ' + req.ip)
 
     if (q.hasOwnProperty('adid')) {
         newAdItem(req, res)
@@ -79,6 +82,7 @@ function newAd (req, res) {
     }).then(function (ad) {
         res.json({data: q, ad: ad})
     }).catch(function (err) {
+        shared.logger.log('newAd', 'From: ' + ip + '. ' + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
@@ -92,6 +96,8 @@ function newAdItem (req, res) {
         price           = parseInt(q.price),
         isbn            = parseInt(q.isbn)
         valuesNotEmpty  = shared.checkEmptyValues(q, fields)
+
+    shared.logger.log('newAdItem', 'From: ' + req.ip)
 
     if (!valuesNotEmpty) {
         res.status(404).send({err: 'Not all parameters specified.'})
@@ -109,6 +115,7 @@ function newAdItem (req, res) {
     }).then(function (aditem) {
         res.json(aditem)
     }).catch(function (err) {
+        shared.logger.log('newAdItem', 'From: ' + ip + '. ' + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })

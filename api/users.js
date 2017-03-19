@@ -1,9 +1,10 @@
 var shared  = require('./_shared.js'),
-    models  = require('../models.js'),
     bcrypt  = require('bcrypt'),
-    User    = models.user
+    User    = shared.models.user
 
 function getUsers (req, res) {
+    shared.logger.log('getUsers', "From: " + req.ip)
+
     if (req.query.userid) {
         User.findOne({
             attributes: ["userid", "username", "email", "firstname", "lastname"],
@@ -14,15 +15,19 @@ function getUsers (req, res) {
         }).then(function (user) {
             res.json(user)
         }).catch(function (err) {
+            shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
             console.log(err)
             res.status(404).send({err: 'An error happened'})
         })
+        return
     }
+
     User.findAll({
         attributes: ["userid", "username", "email", "firstname", "lastname"]
     }).then(function (users) {
         res.json(users)
     }).catch(function (err) {
+        shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
@@ -33,12 +38,13 @@ function newUser (req, res) {
     var courseid        = parseInt(req.body.courseid)
     var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
 
+    shared.logger.log('newUser', "From: " + req.ip)
+
     if (!valuesNotEmpty) {
         res.json({err: 'Not all parameters specified.'})
         return
     }
-    console.log(req.body)
-
+    
     User.find({
         where: {
             $or: [
@@ -71,6 +77,7 @@ function newUser (req, res) {
         }
 
     }).catch(function (err) {
+        shared.logger.log('newUser', 'From: ' + req.ip + ". " + err, 'error')
         console.log(err)
         res.status(404).json({err: 'An error happened'})
     })
