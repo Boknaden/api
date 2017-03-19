@@ -34,8 +34,7 @@ function getUsers (req, res) {
 }
 
 function newUser (req, res) {
-    var fields          = ["username", "passphrase", "email", "firstname", "lastname"]
-    var courseid        = parseInt(req.body.courseid)
+    var fields          = ["username", "passphrase", "courseid", "email", "firstname", "lastname"]
     var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
 
     shared.logger.log('newUser', "From: " + req.ip)
@@ -44,7 +43,7 @@ function newUser (req, res) {
         res.json({err: 'Not all parameters specified.'})
         return
     }
-    
+
     User.find({
         where: {
             $or: [
