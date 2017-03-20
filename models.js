@@ -17,6 +17,7 @@ var User = sequelize.define('user', {
     username: { type: Sequelize.STRING(20), allowNull: false },
     passphrase: { type: Sequelize.STRING(255), allowNull: false },
     email: { type: Sequelize.STRING(255), allowNull: false },
+    phone: { type: Sequelize.INTEGER, allowNull: false },
     firstname: { type: Sequelize.STRING(50), allowNull: false },
     lastname: { type: Sequelize.STRING(50), allowNull: false },
     lastlogin: Sequelize.DATE,

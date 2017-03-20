@@ -20,8 +20,9 @@ function authenticate (req, res) {
         if (user) {
             bcrypt.compare(passphrase, user.passphrase, function (err, authed) {
                 if (err) {
+                    shared.logger.log('authenticate', 'From: ' + req.ip + '. ' + err, 'error')
                     console.log(err)
-                    res.json({
+                    res.status(500).json({
                         success: false,
                         message: 'An error happened (0).'
                     })
@@ -29,7 +30,7 @@ function authenticate (req, res) {
                 }
 
                 if (!authed) {
-                    res.json({
+                    res.status(401).json({
                         success: false,
                         message: 'Your credentials are wrong (0).' // av sikkerhetsmessige grunner røper vi ikke hvilken del av nøklene som er feil
                     })
@@ -47,7 +48,7 @@ function authenticate (req, res) {
             })
 
         } else {
-            res.json({
+            res.status(401).json({
                 success: false,
                 message: 'Your credentials are wrong (1).'
             })
