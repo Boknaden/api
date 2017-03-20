@@ -50,7 +50,7 @@ function getAds (req, res) {
         }
         res.json(payload)
     }).catch(function (err) {
-        shared.logger.log('getAds', 'From: ' + ip + '. ' + err, 'error')
+        shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
@@ -82,7 +82,7 @@ function newAd (req, res) {
     }).then(function (ad) {
         res.json({data: q, ad: ad})
     }).catch(function (err) {
-        shared.logger.log('newAd', 'From: ' + ip + '. ' + err, 'error')
+        shared.logger.log('newAd', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
@@ -115,7 +115,7 @@ function newAdItem (req, res) {
     }).then(function (aditem) {
         res.json(aditem)
     }).catch(function (err) {
-        shared.logger.log('newAdItem', 'From: ' + ip + '. ' + err, 'error')
+        shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })

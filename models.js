@@ -52,6 +52,7 @@ var Ad = sequelize.define('ad', {
     universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
     courseid: { type: Sequelize.INTEGER, allowNull: false },
     adname: { type: Sequelize.STRING(100), allowNull: false },
+    pinned: { type: Sequelize.DATE, allowNull: true },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
