@@ -25,7 +25,7 @@ function getCourses (req, res) {
     .then(function (courses) {
         res.json(courses)
     }).catch(function (err) {
-        shared.logger.log('getCourses', 'From: ' + ip + '. ' + err, 'error')
+        shared.logger.log('getCourses', 'From: ' + req.ip + '. ' + err, 'error')
     })
 }
 
