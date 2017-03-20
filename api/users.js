@@ -55,7 +55,10 @@ function newUser (req, res) {
 
         if (!user) {
             bcrypt.hash(req.body.passphrase, req.boknaden.config.security.saltRounds, function (err, hash) {
-
+                if (err) {
+                    shared.logger.log('newUser-hashing', 'From: ' + req.ip + ". " + err, 'error')
+                    res.status(500).json({err: 'An error happened while generating safe password.'})
+                }
                 User.create({
                     username: req.body.username.trim(),
                     passphrase: hash,
