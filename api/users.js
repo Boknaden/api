@@ -34,7 +34,7 @@ function getUsers (req, res) {
 }
 
 function newUser (req, res) {
-    var fields          = ["username", "passphrase", "courseid", "email", "firstname", "lastname"]
+    var fields          = ["username", "passphrase", "courseid", "email", "phone", "firstname", "lastname"]
     var valuesNotEmpty  = shared.checkEmptyValues(req.body, fields)
 
     shared.logger.log('newUser', "From: " + req.ip)
@@ -60,6 +60,7 @@ function newUser (req, res) {
                     username: req.body.username.trim(),
                     passphrase: hash,
                     email: req.body.email.trim(),
+                    phone: parseInt(req.body.phone),
                     firstname: req.body.firstname.trim(),
                     lastname: req.body.lastname.trim(),
                     courseid: parseInt(req.body.courseid),
