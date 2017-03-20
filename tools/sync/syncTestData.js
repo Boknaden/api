@@ -21,6 +21,7 @@ models.university.create({
         username: 'biggiesmalls',
         passphrase: '$2a$10$/mV5CtmwMGkeZMtEl2j71uyLtKZ7LQ5mY6fRtMUfp7puVtTD4ar6i',
         email: 'biggie.smalls@gmail.com',
+        phone: 95281000,
         firstname: 'Biggie',
         lastname: 'Smalls',
     })
