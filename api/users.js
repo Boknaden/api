@@ -69,6 +69,7 @@ function newUser (req, res) {
                     res.json(user)
                 }).catch(function (err) {
                     console.log(err)
+                    shared.logger.log('newUser', 'From: ' + req.ip + ". " + err, 'error')
                     res.json({err: 'An error happened while creating the user.'})
                 })
             })
