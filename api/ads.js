@@ -15,6 +15,39 @@ function getAds (req, res) {
         offset      = (page - 1) * limit
 
     shared.logger.log('getAds', 'From: ' + req.ip)
+    if (q.adid && typeof parseInt(q.adid) === 'number') {
+        Ad.findOne({
+            where: {
+                adid: parseInt(q.adid)
+            },
+            include: [{
+                model: User,
+                attributes: ['username', 'firstname', 'lastname'],
+            }, {
+                model: AdItem,
+                include: [
+                    {
+                        model: Image
+                    }
+                ]
+            }, {
+                model: Course,
+                attributes: ['courseid', 'coursename'],
+                include: [
+                    {
+                        model: University
+                    }
+                ]
+            }],
+        }).then(function (ad) {
+            res.json(ad)
+        }).catch(function (err) {
+            shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')
+            console.log(err)
+            res.status(500).send({err: 'An error happened'})
+        })
+        return
+    }
 
     Ad.findAndCountAll({
         limit: limit,
@@ -52,7 +85,7 @@ function getAds (req, res) {
     }).catch(function (err) {
         shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
-        res.status(404).send({err: 'An error happened'})
+        res.status(500).send({err: 'An error happened'})
     })
 }
 

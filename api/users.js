@@ -5,30 +5,45 @@ var shared  = require('./_shared.js'),
 function getUsers (req, res) {
     shared.logger.log('getUsers', "From: " + req.ip)
 
-    if (req.query.userid) {
-        User.findOne({
-            attributes: ["userid", "username", "email", "firstname", "lastname"],
-            include: [],
-            where: {
-                userid: parseInt(req.query.userid)
-            }
-        }).then(function (user) {
-            res.json(user)
+    let atts    = ["userid", "username", "firstname", "lastname"],
+        token   = req.headers['boknaden-verify'] || false
+
+    shared.verifyToken(token, (verified) => {
+        token = verified
+
+        if (token) {
+            atts.push("email")
+        }
+
+        if (req.query.userid) {
+            User.findOne({
+                attributes: atts,
+                include: [],
+                where: {
+                    userid: parseInt(req.query.userid)
+                }
+            }).then(function (user) {
+                res.json(user)
+            }).catch(function (err) {
+                shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
+                console.log(err)
+                res.status(404).send({err: 'An error happened'})
+            })
+            return
+        }
+
+        User.findAll({
+            attributes: atts,
+        }).then(function (users) {
+            res.json(users)
         }).catch(function (err) {
             shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
             console.log(err)
             res.status(404).send({err: 'An error happened'})
         })
-        return
-    }
 
-    User.findAll({
-        attributes: ["userid", "username", "email", "firstname", "lastname"]
-    }).then(function (users) {
-        res.json(users)
-    }).catch(function (err) {
+    }, (err) => {
         shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
-        console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
 }

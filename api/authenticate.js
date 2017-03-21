@@ -18,6 +18,7 @@ function authenticate (req, res) {
         }
     }).then(function (user) {
         if (user) {
+            // hashing av passord ved hjelp av blowfishalgoritmen
             bcrypt.compare(passphrase, user.passphrase, function (err, authed) {
                 if (err) {
                     shared.logger.log('authenticate', 'From: ' + req.ip + '. ' + err, 'error')
@@ -32,7 +33,7 @@ function authenticate (req, res) {
                 if (!authed) {
                     res.status(401).json({
                         success: false,
-                        message: 'Your credentials are wrong (0).' // av sikkerhetsmessige grunner røper vi ikke hvilken del av nøklene som er feil
+                        message: 'Feil brukernavn eller passord.' // av sikkerhetsmessige grunner røper vi ikke hvilken del av nøklene som er feil
                     })
                     return
                 }
@@ -50,7 +51,7 @@ function authenticate (req, res) {
         } else {
             res.status(401).json({
                 success: false,
-                message: 'Your credentials are wrong (1).'
+                message: 'Feil brukernavn eller passord.'
             })
         }
     }).catch(function (err) {

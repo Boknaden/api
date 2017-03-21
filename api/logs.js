@@ -2,7 +2,13 @@ var shared      = require('./_shared'),
     Log      = shared.models.log
 
 function getLogs (req, res) {
-    if (req.user_token.isadmin) {
+    let isadmin
+
+    if (req.hasOwnProperty('user_token')) {
+        isadmin = req.user_token.isadmin
+    }
+
+    if (isadmin || parseInt(process.env.DEBUG) === 1) {
         Log.findAll({
             order: 'createddate DESC'
         })

@@ -1,11 +1,14 @@
-// Exposes function for logging
-
 var models  = require('../models.js'),
     Log     = models.log
 
 function log (loggedfrom, message, state) {
     var loggedfrom  = loggedfrom || 'app',
         state       = state || 'info'
+
+    if (process.env.VERBOSE === 0) {
+        return
+    }
+
     Log.create({
         loggedfrom: loggedfrom,
         message: message,

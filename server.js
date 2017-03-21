@@ -18,12 +18,12 @@ function registerEndpoint(app, routePath, filePath) {
 
     if (el.hasOwnProperty('requiresAuth') && (parseInt(process.env.DEBUG) === 0)) { // middleware for å sjekke jwts
         router.use(function (req, res, next) {
+            var token = req.body.token || req.headers['boknaden-verify'] || false // token kan sendes til alle routes
+
             if (!el.requiresAuth[req.method]) { // dersom endepunktet brukeren forsøker å nå ikke krever autentisering
                 next() // kjører endepunktet
                 return
             }
-
-            var token = req.body.token || req.query.token || req.headers['boknaden-verify'] // token kan sendes på flere måter, querystring, post body, header
 
             if (token) {
                 jwt.verify(token, config.security.secret, function (err, verified_token) {

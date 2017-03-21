@@ -1,7 +1,22 @@
-/* DRY (IGD: ikke gjenta deg) */
-
 var logger = require('../tools/logger.js'),
+    config = require('../config.js'),
+    jwt    = require('jsonwebtoken'),
     models = require('../models.js')
+
+function verifyToken (token, cb, err) {
+    if (token) {
+        jwt.verify(token, config.security.secret, function (err, verified_token) {
+            if (err) {
+                err(err)
+                return
+            }
+            cb(verified_token)
+            return
+        })
+    } else {
+        cb(false)
+    }
+}
 
 function genQuestionMarks (fields) {
     var qmarks = ""
@@ -55,5 +70,7 @@ module.exports = {
     genQuestionMarks: genQuestionMarks,
     checkEmptyValues: checkEmptyValues,
     logger: logger,
-    models: models
+    models: models,
+    verifyToken: verifyToken,
+    config: config,
 }
