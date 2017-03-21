@@ -22,6 +22,7 @@ var User = sequelize.define('user', {
     lastname: { type: Sequelize.STRING(50), allowNull: false },
     lastlogin: Sequelize.DATE,
     isadmin: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -53,7 +54,9 @@ var Ad = sequelize.define('ad', {
     universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
     courseid: { type: Sequelize.INTEGER, allowNull: false },
     adname: { type: Sequelize.STRING(100), allowNull: false },
+    text: { type: Sequelize.TEXT, allowNull: true },
     pinned: { type: Sequelize.DATE, allowNull: true },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -73,6 +76,7 @@ var AdItem = sequelize.define('aditem', {
     text: { type: Sequelize.TEXT, allowNull: false },
     description: { type: Sequelize.TEXT, allowNull: true },
     isbn: { type: Sequelize.STRING(13), allowNull: true },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -87,6 +91,7 @@ var Course = sequelize.define('course', {
     },
     coursename: { type: Sequelize.STRING(60), allowNull: false },
     universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -102,6 +107,7 @@ var University = sequelize.define('university', {
     universityname: { type: Sequelize.STRING(60), allowNull: false },
     longitude: { type: Sequelize.FLOAT, allowNull: false },
     latitude: { type: Sequelize.FLOAT, allowNull: false },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -118,6 +124,7 @@ var Image = sequelize.define('image', {
     imageurl: { type: Sequelize.STRING(255), allowNull: false },
     title: { type: Sequelize.STRING(30), allowNull: false },
     description: { type: Sequelize.TEXT, allowNull: true },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -148,6 +155,7 @@ var ChatMessage = sequelize.define('chatmessage', {
     chatid: { type: Sequelize.INTEGER, allowNull: false },
     message: { type: Sequelize.TEXT, allowNull: false },
     imageid: { type: Sequelize.INTEGER, allowNull: true },
+    deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',

@@ -32,6 +32,7 @@ models.university.create({
         universityid: 1,
         courseid: 1,
         adname: 'Et utvalg bøker',
+        text: 'Prisen kan diskuteres, men det er et ganske godt avslag så går ikke veldig under.',
     })
 
 }).then(function (res) {
