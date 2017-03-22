@@ -1,5 +1,7 @@
 /*
-Scriptet henter kurs som finnes for campus vestfold (config.js)
+
+    Scriptet henter lister over linjer på alle campus ved USN og lagrer disse i en valgt mappe (config.js)
+
 */
 
 var request     = require('request'),
