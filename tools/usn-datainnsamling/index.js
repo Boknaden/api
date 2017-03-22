@@ -1,25 +1,76 @@
-var request = require('request'),
-    fs      = require('fs'),
-    config  = require('./config.js')
+/*
+Scriptet henter kurs som finnes for campus vestfold (config.js)
+*/
 
-request({
-    method: 'GET',
-    uri: config.courses,
-}, function (err, res, body) {
-    if (err) {
-        console.log(err)
-        return
-    }
+var request     = require('request'),
+    fs          = require('fs'),
+    config      = require('./config.js'),
+    readline    = require('readline')
 
-    var body = JSON.parse(body) || null
-
-    if (body) {
-        fs.writeFile(config.data.path + 'courses.json', JSON.stringify(body.articles), (err) => {
-            if (err) {
-                console.log(err)
-            }
-
-            console.log('added courses.json to ' + config.data.path)
-        })
-    }
+var rl1 = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
 })
+
+console.log("Choose campus")
+for (var i = 0; i < config.campuses.length; i++) {
+    console.log(i + ". Campus " + config.campuses[i])
+}
+console.log("Type 'all' to download data for all of 'em")
+
+rl1.question('', (answer) => {
+    if (answer) {
+
+        if (typeof answer === 'string' && answer === 'all') {
+            var uris = [],
+                filenames = []
+            for (var i = 0; i < config.campuses.length; i++) {
+                var campus = config.campuses[i]
+
+                uris.push(config.uri.replace('Vestfold', campus))
+                filenames.push(config.prefix + '-' + campus.toLowerCase())
+            }
+            bulkSaveData(uris, filenames)
+        } else {
+            var answer  = parseInt(answer),
+                uri     = config.uri(config.campuses, answer)
+
+            saveData(uri, config.prefix + '-' + config.campuses[answer].toLowerCase())
+        }
+
+    }
+
+    rl1.close()
+})
+
+function bulkSaveData (uris, filenames) {
+
+    for (var i = 0; i < uris.length; i++) {
+        saveData(uris[i], filenames[i])
+    }
+
+}
+
+function saveData (uri, filename) {
+    request({
+        method: 'GET',
+        uri: uri,
+    }, function (err, res, body) {
+        if (err) {
+            console.log(err)
+            return
+        }
+
+        var body = JSON.parse(body) || null
+
+        if (body) {
+            fs.writeFile(config.path + filename + '.json', JSON.stringify(body.articles), (err) => {
+                if (err) {
+                    console.log(err)
+                }
+
+                console.log('Wrote ' + filename + ' to ' + config.path)
+            })
+        }
+    })
+}
