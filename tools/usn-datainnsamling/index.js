@@ -16,7 +16,7 @@ var rl1 = readline.createInterface({
 
 console.log("Choose campus")
 for (var i = 0; i < config.campuses.length; i++) {
-    console.log(i + ". Campus " + config.campuses[i])
+    console.log(i+1 + ". " + config.campuses[i])
 }
 console.log("Type 'all' to download data for all of 'em")
 
@@ -34,8 +34,8 @@ rl1.question('', (answer) => {
             }
             bulkSaveData(uris, filenames)
         } else {
-            var answer  = parseInt(answer),
-                uri     = config.uri(config.campuses, answer)
+            var answer  = parseInt(answer) - 1,
+                uri     = config.uri.replace('Vestfold', config.campuses[answer])
 
             saveData(uri, config.prefix + '-' + config.campuses[answer].toLowerCase())
         }
@@ -71,7 +71,7 @@ function saveData (uri, filename) {
                     console.log(err)
                 }
 
-                console.log('Wrote ' + filename + ' to ' + config.path)
+                console.log('Wrote ' + filename + '.json to ' + config.path)
             })
         }
     })
