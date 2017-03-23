@@ -94,7 +94,8 @@ function newAd (req, res) {
         fields          = ["courseid", "adname"],
         user            = parseInt(q.userid),
         course          = parseInt(q.courseid),
-        valuesNotEmpty  = shared.checkEmptyValues(q, fields)
+        valuesNotEmpty  = shared.checkEmptyValues(q, fields),
+        aditems         = q.aditems
 
     shared.logger.log('newAd', 'From: ' + req.ip)
 
@@ -113,6 +114,9 @@ function newAd (req, res) {
         courseid: course,
         adname: q.adname.trim(),
     }).then(function (ad) {
+
+
+
         res.json({data: q, ad: ad})
     }).catch(function (err) {
         shared.logger.log('newAd', 'From: ' + req.ip + '. ' + err, 'error')
@@ -121,31 +125,64 @@ function newAd (req, res) {
     })
 }
 
-function newAdItem (req, res) {
+function newAdItem (adid, newAdItems) {
     var q               = req.body,
-        description     = q.description || null
-        fields          = ["adid", "text", "price", "isbn"],
-        adid            = parseInt(q.adid),
-        price           = parseInt(q.price),
-        isbn            = parseInt(q.isbn)
-        valuesNotEmpty  = shared.checkEmptyValues(q, fields)
+        description     = q.description || null,
+        fields          = ["text", "price", "isbn"],
+        valuesNotEmpty  = false,
+        itemsToInsert   = []
+
+
+    if (typeof newAdItems === 'array') {
+        for (var i = 0; i < newAdItems.length; i++) {
+            var aditem = newAdItems[i]
+            valuesNotEmpty = shared.checkEmptyValues(aditem, fields)
+
+            for (k in aditem) {
+                if (aditem.hasOwnProperty(k)) {
+                    var value = aditem[k]
+
+                    if (typeof value === 'string') {
+                        aditem[k] = value.trim()
+                    }
+
+                }
+            }
+
+            if (!valuesNotEmpty) {
+                res.status(404).send({err: 'Not all parameters for aditem ' + aditem.text + ' specified.'})
+                return
+            }
+
+            aditem.userid = req.user_token.userid
+        }
+
+        itemsToInsert = newAdItems
+
+    } else if (typeof newAdItems === 'object') {
+        valuesNotEmpty = shared.checkEmptyValues(newAdItems, fields)
+
+        if (!valuesNotEmpty) {
+            res.status(404).send({err: 'Not all parameters for aditem ' + aditem.text + ' specified.'})
+            return
+        }
+
+        itemsToInsert.push(newAdItems)
+    }
 
     shared.logger.log('newAdItem', 'From: ' + req.ip)
 
-    if (!valuesNotEmpty) {
-        res.status(404).send({err: 'Not all parameters specified.'})
-        return
-    }
+    // {
+    //     userid: req.user_token.userid,
+    //     description: description,
+    //     adid: adid,
+    //     price: price,
+    //     text: q.text.trim(),
+    //     description: description,
+    //     isbn: isbn,
+    // }
 
-    AdItem.create({
-        userid: req.user_token.userid,
-        description: description,
-        adid: adid,
-        price: price,
-        text: q.text.trim(),
-        description: description,
-        isbn: isbn,
-    }).then(function (aditem) {
+    AdItem.bulkCreate(itemsToInsert).then(function (aditem) {
         res.json(aditem)
     }).catch(function (err) {
         shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
