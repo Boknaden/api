@@ -7,7 +7,8 @@
 var request     = require('request'),
     fs          = require('fs'),
     config      = require('./config.js'),
-    readline    = require('readline')
+    readline    = require('readline'),
+    mkdirp      = require('mkdirp')
 
 var rl1 = readline.createInterface({
     input: process.stdin,
@@ -19,6 +20,7 @@ for (var i = 0; i < config.campuses.length; i++) {
     console.log(i+1 + ". " + config.campuses[i])
 }
 console.log("Type 'all' to download data for all of 'em")
+console.log("Type 'view [number]' to view downloaded files")
 
 rl1.question('', (answer) => {
     if (answer) {
@@ -33,6 +35,13 @@ rl1.question('', (answer) => {
                 filenames.push(config.prefix + '-' + campus.toLowerCase())
             }
             bulkSaveData(uris, filenames)
+        } else if (typeof answer === 'string' && answer.substr(0, 4) === 'view') {
+            var params      = answer.split(' '),
+                idx         = parseInt(params[1]),
+                filename    = config.prefix + '-' + config.campuses[idx - 1].toLowerCase()
+
+            readData(filename)
+
         } else {
             var answer  = parseInt(answer) - 1,
                 uri     = config.uri.replace('Vestfold', config.campuses[answer])
@@ -44,6 +53,15 @@ rl1.question('', (answer) => {
 
     rl1.close()
 })
+
+function readData (filename) {
+    fs.readFile(config.path + filename + '.json', (err, data) => {
+        if (err)
+            console.log(err)
+
+        console.log(JSON.parse(data))
+    })
+}
 
 function bulkSaveData (uris, filenames) {
 

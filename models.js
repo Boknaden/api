@@ -169,7 +169,7 @@ var PasswordReset = sequelize.define('passwordreset', {
         primaryKey: true,
     },
     userid: { type: Sequelize.INTEGER, allowNull: false },
-    link: { type: Sequelize.STRING(255), allowNull: false },
+    code: { type: Sequelize.STRING(255), allowNull: false },
     active: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 1 }
 }, {
     createdAt: 'createddate',
