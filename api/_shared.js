@@ -1,7 +1,10 @@
-var logger = require('../tools/logger.js'),
-    config = require('../config.js'),
-    jwt    = require('jsonwebtoken'),
-    models = require('../models.js')
+var logger          = require('../tools/logger.js'),
+    config          = require('../config.js'),
+    jwt             = require('jsonwebtoken'),
+    models          = require('../models.js'),
+    bcrypt          = require('bcrypt'),
+    randomstring    = require('randomstring'),
+    nodemailer      = require('nodemailer')
 
 function verifyToken (token, cb, err) {
     if (token) {
@@ -66,11 +69,25 @@ function arrObjPropToList (values, needle) {
 
 }
 
+function mailTransporter () {
+    return nodemailer.createTransport({
+        service: config.email.service,
+        auth: {
+            user: config.email.user,
+            pass: config.email.pass,
+        },
+    })
+}
+
 module.exports = {
     genQuestionMarks: genQuestionMarks,
     checkEmptyValues: checkEmptyValues,
     logger: logger,
     models: models,
     verifyToken: verifyToken,
+    jwt: jwt,
     config: config,
+    bcrypt: bcrypt,
+    randomstring: randomstring,
+    getMailTransporter: mailTransporter
 }

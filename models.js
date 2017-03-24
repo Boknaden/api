@@ -162,9 +162,25 @@ var ChatMessage = sequelize.define('chatmessage', {
     tableName: 'chatmessages',
 })
 
+var PasswordReset = sequelize.define('passwordreset', {
+    passwordresetid: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    userid: { type: Sequelize.INTEGER, allowNull: false },
+    link: { type: Sequelize.STRING(255), allowNull: false },
+    active: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 1 }
+}, {
+    createdAt: 'createddate',
+    updatedAt: 'updateddate',
+    tableName: 'passwordresets',
+})
+
 User.hasMany(Ad, { foreignKey: 'userid' })
 User.hasMany(AdItem, { foreignKey: 'userid' })
 User.hasMany(Image, { foreignKey: 'userid' })
+User.hasMany(PasswordReset, { foreignKey: 'userid' })
 User.belongsTo(Course, { foreignKey: 'courseid' })
 
 University.hasMany(Ad, { foreignKey: 'universityid' })
@@ -178,11 +194,15 @@ Ad.hasMany(AdItem, { foreignKey: 'adid' })
 Ad.belongsTo(User, { foreignKey: 'userid' })
 Ad.belongsTo(Course, { foreignKey: 'courseid' })
 Ad.belongsTo(University, { foreignKey: 'universityid' })
+
 AdItem.belongsTo(Ad, { foreignKey: 'adid' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
 AdItem.belongsTo(Image, { foreignKey: 'imageid' })
+
 Image.belongsTo(User, { foreignKey: 'userid' })
 Image.hasMany(AdItem, { foreignKey: 'imageid' })
+
+PasswordReset.belongsTo(User, { foreignKey: 'userid' })
 
 module.exports = {
     sequelize: sequelize,
@@ -193,4 +213,5 @@ module.exports = {
     university: University,
     image: Image,
     log: Log,
+    passwordreset: PasswordReset,
 }

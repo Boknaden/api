@@ -1,5 +1,5 @@
 var shared  = require('./_shared.js'),
-    bcrypt  = require('bcrypt'),
+    bcrypt  = shared.bcrypt,
     User    = shared.models.user
 
 function getUsers (req, res) {

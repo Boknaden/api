@@ -10,5 +10,13 @@ module.exports = {
         saltRounds: 10, // hva det "koster" å utføre hashing (høyere tall er bedre)
         secret: 'boknadensigneringsnokkel',
         tokenExpiration: '48h', // token er gyldig i 48 timer
+    },
+    email: {
+        service: 'gmail',
+        user: 'email',
+        pass: 'password',
+        defaults: {
+            from: '',
+        }
     }
 }

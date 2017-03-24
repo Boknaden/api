@@ -115,9 +115,13 @@ function newAd (req, res) {
         adname: q.adname.trim(),
     }).then(function (ad) {
 
+        if (q.hasOwnProperty(aditems)) {
+            var aditems = q.aditems
+            newAdItem(ad.adid, aditems)
+            res.json({message: 'Added aditem with aditems', ad: ad})
+        }
 
-
-        res.json({data: q, ad: ad})
+        res.json({message: 'Did not create aditems', ad: ad})
     }).catch(function (err) {
         shared.logger.log('newAd', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
