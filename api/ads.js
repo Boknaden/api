@@ -78,7 +78,7 @@ function getAds (req, res) {
         var payload = {
             limit: limit,
             offset: offset,
-            count: ads.count,
+            count: ads.rows.length,
             ads: ads.rows,
         }
         res.json(payload)
