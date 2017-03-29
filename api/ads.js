@@ -12,13 +12,20 @@ function getAds (req, res) {
         university  = parseInt(q.university) || undefined,
         limit       = parseInt(q.limit) || 20,
         page        = parseInt(q.page) || 1,
-        offset      = (page - 1) * limit
+        offset      = (page - 1) * limit,
+
+        suppliedWhere       = {deleted: 0}
 
     shared.logger.log('getAds', 'From: ' + req.ip)
+    if (q.userid && !isNaN(parseInt(q.userid))) {
+        suppliedWhere.userid = q.userid
+    }
+
     if (q.adid && typeof parseInt(q.adid) === 'number') {
         Ad.findOne({
             where: {
-                adid: parseInt(q.adid)
+                adid: parseInt(q.adid),
+                deleted: 0,
             },
             include: [{
                 model: User,
@@ -40,6 +47,11 @@ function getAds (req, res) {
                 ]
             }],
         }).then(function (ad) {
+            if (!ad) {
+                res.status(404).json({success: false, message: 'Not found.'})
+                return
+            }
+
             res.json(ad)
         }).catch(function (err) {
             shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')
@@ -53,6 +65,7 @@ function getAds (req, res) {
         limit: limit,
         offset: offset,
         order: 'createddate DESC',
+        where: suppliedWhere,
         include: [
             {
                 model: User,
@@ -92,12 +105,13 @@ function getAds (req, res) {
 function newAd (req, res) {
     var q               = req.body,
         fields          = ["courseid", "adname"],
-        user            = parseInt(q.userid),
         course          = parseInt(q.courseid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields),
         aditems         = q.aditems
 
     shared.logger.log('newAd', 'From: ' + req.ip)
+
+    console.log(q)
 
     if (q.hasOwnProperty('adid')) {
         newAdItem(req, res)
@@ -115,13 +129,14 @@ function newAd (req, res) {
         adname: q.adname.trim(),
     }).then(function (ad) {
 
-        if (q.hasOwnProperty(aditems)) {
-            var aditems = q.aditems
-            newAdItem(ad.adid, aditems)
+        newAdItem(req, res, ad.adid, JSON.parse(q.aditems)).then(function (aditem) {
             res.json({message: 'Added aditem with aditems', ad: ad})
-        }
+        }).catch(function (err) {
+            shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
+            console.log(err)
+            res.status(404).send({err: 'An error happened'})
+        })
 
-        res.json({message: 'Did not create aditems', ad: ad})
     }).catch(function (err) {
         shared.logger.log('newAd', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
@@ -129,50 +144,38 @@ function newAd (req, res) {
     })
 }
 
-function newAdItem (adid, newAdItems) {
+function newAdItem (req, res, adid, newAdItems) {
     var q               = req.body,
         description     = q.description || null,
-        fields          = ["text", "price", "isbn"],
+        fields          = ["text", "price"],
         valuesNotEmpty  = false,
         itemsToInsert   = []
 
+    for (var i = 0; i < newAdItems.length; i++) {
+        var aditem = newAdItems[i]
+        valuesNotEmpty = shared.checkEmptyValues(aditem, fields)
 
-    if (typeof newAdItems === 'array') {
-        for (var i = 0; i < newAdItems.length; i++) {
-            var aditem = newAdItems[i]
-            valuesNotEmpty = shared.checkEmptyValues(aditem, fields)
+        for (k in aditem) {
+            if (aditem.hasOwnProperty(k)) {
+                var value = aditem[k]
 
-            for (k in aditem) {
-                if (aditem.hasOwnProperty(k)) {
-                    var value = aditem[k]
-
-                    if (typeof value === 'string') {
-                        aditem[k] = value.trim()
-                    }
-
+                if (typeof value === 'string') {
+                    aditem[k] = value.trim()
                 }
-            }
 
-            if (!valuesNotEmpty) {
-                res.status(404).send({err: 'Not all parameters for aditem ' + aditem.text + ' specified.'})
-                return
             }
-
-            aditem.userid = req.user_token.userid
         }
-
-        itemsToInsert = newAdItems
-
-    } else if (typeof newAdItems === 'object') {
-        valuesNotEmpty = shared.checkEmptyValues(newAdItems, fields)
 
         if (!valuesNotEmpty) {
             res.status(404).send({err: 'Not all parameters for aditem ' + aditem.text + ' specified.'})
             return
         }
 
-        itemsToInsert.push(newAdItems)
+        aditem.userid = req.user_token.userid
+        aditem.adid = adid
     }
+
+    itemsToInsert = newAdItems
 
     shared.logger.log('newAdItem', 'From: ' + req.ip)
 
@@ -186,21 +189,55 @@ function newAdItem (adid, newAdItems) {
     //     isbn: isbn,
     // }
 
-    AdItem.bulkCreate(itemsToInsert).then(function (aditem) {
-        res.json(aditem)
-    }).catch(function (err) {
-        shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
-        console.log(err)
-        res.status(404).send({err: 'An error happened'})
-    })
+    return AdItem.bulkCreate(itemsToInsert)
 
+}
+
+function updateAd (req, res) {
+
+}
+
+function deleteAd (req, res) {
+    if (req.user_token) {
+        var adid = req.body.adid || null
+
+        shared.logger.log('deleteAd', 'From: ' + req.ip)
+
+        if ( !isNaN(parseInt(adid)) ) {
+            Ad.findOne({
+                where: {
+                    adid: parseInt(adid),
+                    userid: req.user_token.userid
+                }
+            }).then(function (ad) {
+                if (ad) {
+                    ad.set('deleted', 1)
+
+                    return ad.save()
+                } else {
+                    res.status(404).json({success: false, message: 'Couldn\'t verify your integrity.'})
+                }
+            }).then(function (update) {
+                res.json(update)
+            }).catch(function (err) {
+                shared.logger.log('deleteAd', 'From: ' + req.ip + '. ' + err, 'error')
+                res.status(500).json({success: false, message: 'An error happened while updating.'})
+            })
+            return
+        }
+    }
+    res.status(403).json({success: false, message: 'Authenticate pls'})
 }
 
 module.exports = {
     get: getAds,
     post: newAd,
+    put: updateAd,
+    delete: deleteAd,
     requiresAuth: {
         'GET': false,
         'POST': true,
+        'PUT': true,
+        'DELETE': true,
     }
 }

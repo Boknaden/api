@@ -195,7 +195,7 @@ Ad.belongsTo(User, { foreignKey: 'userid' })
 Ad.belongsTo(Course, { foreignKey: 'courseid' })
 Ad.belongsTo(University, { foreignKey: 'universityid' })
 
-AdItem.belongsTo(Ad, { foreignKey: 'adid' })
+AdItem.belongsTo(Ad, { foreignKey: 'adid', onDelete: 'cascade' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
 AdItem.belongsTo(Image, { foreignKey: 'imageid' })
 

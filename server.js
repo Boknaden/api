@@ -20,25 +20,37 @@ function registerEndpoint(app, routePath, filePath) {
         router.use(function (req, res, next) {
             var token = req.body.token || req.headers['boknaden-verify'] || false // token kan sendes til alle routes
 
-            if (!el.requiresAuth[req.method]) { // dersom endepunktet brukeren forsøker å nå ikke krever autentisering
-                next() // kjører endepunktet
+            if (!el.requiresAuth[req.method]) {
+                if (token) {
+                    jwt.verify(token, config.security.secret, function (err, verified_token) {
+                        if (err) {
+                            req.user_token = null
+                        }
+
+                        req.user_token = verified_token
+                    })
+                }
+                next()
                 return
+            } else {
+                if (token) {
+                    jwt.verify(token, config.security.secret, function (err, verified_token) {
+                        if (err) {
+                            req.user_token = null
+                        }
+
+                        req.user_token = verified_token
+
+                        return next()
+                    })
+                } else {
+                    return res.status(403).send({
+                        success: false,
+                        message: 'This endpoint to Boknaden requires authentication.'
+                    })
+                }
             }
 
-            if (token) {
-                jwt.verify(token, config.security.secret, function (err, verified_token) {
-                    if (err) {
-                        return res.json({success: false, message: 'Couldn\'t verify token.'}) // token har blitt harselert med
-                    }
-                    req.user_token = verified_token
-                    next()
-                })
-            } else { // dersom token ikke er supplert og endepunktet krever det
-                return res.status(403).send({
-                    success: false,
-                    message: 'This endpoint to Boknaden requires authentication.'
-                });
-            }
         })
     }
 
@@ -67,7 +79,8 @@ function registerDependencies (req, res, next) {
 /* APIet svarer alltid med JSON, dette gjør så klienten vet at den mottar JSON */
 app.use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, boknaden-verify");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE")
     res.set('Content-Type', 'application/json')
     next();
 });
