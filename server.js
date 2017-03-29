@@ -24,14 +24,17 @@ function registerEndpoint(app, routePath, filePath) {
                 if (token) {
                     jwt.verify(token, config.security.secret, function (err, verified_token) {
                         if (err) {
+                            next()
                             req.user_token = null
                         }
 
                         req.user_token = verified_token
+                        next()
+                        return
                     })
+                } else {
+                    next()
                 }
-                next()
-                return
             } else {
                 if (token) {
                     jwt.verify(token, config.security.secret, function (err, verified_token) {

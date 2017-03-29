@@ -14,11 +14,16 @@ function getAds (req, res) {
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit,
 
-        suppliedWhere       = {deleted: 0}
+        suppliedWhere  = {deleted: 0},
+        userAttributes = ['username', 'firstname', 'lastname']
 
     shared.logger.log('getAds', 'From: ' + req.ip)
     if (q.userid && !isNaN(parseInt(q.userid))) {
         suppliedWhere.userid = q.userid
+    }
+
+    if (req.user_token) {
+        userAttributes.push('email')
     }
 
     if (q.adid && typeof parseInt(q.adid) === 'number') {
@@ -29,7 +34,7 @@ function getAds (req, res) {
             },
             include: [{
                 model: User,
-                attributes: ['username', 'firstname', 'lastname'],
+                attributes: userAttributes,
             }, {
                 model: AdItem,
                 include: [
@@ -69,7 +74,7 @@ function getAds (req, res) {
         include: [
             {
                 model: User,
-                attributes: ['username', 'firstname', 'lastname'],
+                attributes: userAttributes,
             }, {
                 model: AdItem,
                 include: [
@@ -127,9 +132,10 @@ function newAd (req, res) {
         userid: req.user_token.userid,
         courseid: course,
         adname: q.adname.trim(),
+        text: q.text || null
     }).then(function (ad) {
 
-        newAdItem(req, res, ad.adid, JSON.parse(q.aditems)).then(function (aditem) {
+        newAdItem(req, res, ad.adid, q.aditems).then(function (aditem) {
             res.json({message: 'Added aditem with aditems', ad: ad})
         }).catch(function (err) {
             shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
