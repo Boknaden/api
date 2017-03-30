@@ -37,7 +37,7 @@ var Log = sequelize.define('log', {
     },
     loggedfrom: { type: Sequelize.STRING(255), allowNull: false },
     message: { type: Sequelize.TEXT, allowNull: false },
-    state: { type: Sequelize.ENUM('info', 'error'), allowNull: false }
+    state: { type: Sequelize.ENUM('info', 'notice', 'error'), allowNull: false }
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -51,7 +51,6 @@ var Ad = sequelize.define('ad', {
         primaryKey: true,
     },
     userid: { type: Sequelize.INTEGER, allowNull: false },
-    universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
     courseid: { type: Sequelize.INTEGER, allowNull: false },
     adname: { type: Sequelize.STRING(100), allowNull: false },
     text: { type: Sequelize.TEXT, allowNull: true },
@@ -90,12 +89,26 @@ var Course = sequelize.define('course', {
         primaryKey: true
     },
     coursename: { type: Sequelize.STRING(60), allowNull: false },
-    universityid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
+    campusid: { type: Sequelize.INTEGER, allowNull: true, defaultValue: 1 },
     deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
     tableName: 'courses',
+})
+
+var Interested = sequelize.define('interested', {
+    interestedid: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true
+    },
+    userid: { type: Sequelize.INTEGER, allowNull: false },
+    adid: { type: Sequelize.INTEGER, allowNull: false },
+}, {
+    createdAt: 'createddate',
+    updatedAt: 'updateddate',
+    tableName: 'interesteds',
 })
 
 var University = sequelize.define('university', {
@@ -112,6 +125,21 @@ var University = sequelize.define('university', {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
     tableName: 'universities',
+})
+
+var Campus = sequelize.define('campus', {
+    campusid: {
+        type: Sequelize.INTEGER,
+        autoIncrement: true,
+        primaryKey: true,
+    },
+    campusname: { type: Sequelize.STRING(60), allowNull: false },
+    universityid: { type: Sequelize.INTEGER, allowNull: false },
+    deleted: {type: Sequelize.INTEGER, defaultValue: 0, allowNull: false},
+}, {
+    createdAt: 'createddate',
+    updatedAt: 'updateddate',
+    tableName: 'campuses',
 })
 
 var Image = sequelize.define('image', {
@@ -184,16 +212,19 @@ User.hasMany(PasswordReset, { foreignKey: 'userid' })
 User.belongsTo(Course, { foreignKey: 'courseid' })
 
 University.hasMany(Ad, { foreignKey: 'universityid' })
-University.hasMany(Course, { foreignKey: 'universityid' })
+University.hasMany(Campus, { foreignKey: 'universityid' })
+
+Campus.hasMany(Ad, { foreignKey: 'campusid' })
+Campus.hasMany(Course, { foreignKey: 'campusid' })
+Campus.belongsTo(University, { foreignKey: 'universityid' })
 
 Course.hasMany(User, { foreignKey: 'courseid' })
 Course.hasMany(Ad, { foreignKey: 'courseid' })
-Course.belongsTo(University, { foreignKey: 'universityid' })
+Course.belongsTo(Campus, { foreignKey: 'campusid' })
 
 Ad.hasMany(AdItem, { foreignKey: 'adid' })
 Ad.belongsTo(User, { foreignKey: 'userid' })
 Ad.belongsTo(Course, { foreignKey: 'courseid' })
-Ad.belongsTo(University, { foreignKey: 'universityid' })
 
 AdItem.belongsTo(Ad, { foreignKey: 'adid', onDelete: 'cascade' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
@@ -211,6 +242,8 @@ module.exports = {
     aditem: AdItem,
     course: Course,
     university: University,
+    campus: Campus,
+    interested: Interested,
     image: Image,
     log: Log,
     passwordreset: PasswordReset,

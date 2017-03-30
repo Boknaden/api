@@ -4,12 +4,12 @@ var shared      = require('./_shared.js'),
     User        = shared.models.user,
     Course      = shared.models.course,
     University  = shared.models.university,
+    Campus      = shared.models.campus,
     Image       = shared.models.image
 
 function getAds (req, res) {
     var q           = req.query,
-        course      = parseInt(q.course) || undefined,
-        university  = parseInt(q.university) || undefined,
+        campus      = parseInt(q.campusid) || null,
         limit       = parseInt(q.limit) || 20,
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit,
@@ -24,6 +24,10 @@ function getAds (req, res) {
 
     if (req.user_token) {
         userAttributes.push('email')
+    }
+
+    if (campus) {
+        suppliedWhere['campusid'] = campus
     }
 
     if (q.adid && typeof parseInt(q.adid) === 'number') {
@@ -44,10 +48,14 @@ function getAds (req, res) {
                 ]
             }, {
                 model: Course,
-                attributes: ['courseid', 'coursename'],
                 include: [
                     {
-                        model: University
+                        model: Campus,
+                        include: [
+                            {
+                                model: University
+                            }
+                        ]
                     }
                 ]
             }],
@@ -84,10 +92,14 @@ function getAds (req, res) {
                 ]
             }, {
                 model: Course,
-                attributes: ['courseid', 'coursename'],
                 include: [
                     {
-                        model: University
+                        model: Campus,
+                        include: [
+                            {
+                                model: University
+                            }
+                        ]
                     }
                 ]
             }
@@ -134,8 +146,10 @@ function newAd (req, res) {
         adname: q.adname.trim(),
         text: q.text || null
     }).then(function (ad) {
+        shared.logger.log('newAd', 'Created ad for ' + req.user_token.username)
 
         newAdItem(req, res, ad.adid, q.aditems).then(function (aditem) {
+            shared.logger.log('newAdItem', 'Created aditems for ' + req.user_token.username)
             res.json({message: 'Added aditem with aditems', ad: ad})
         }).catch(function (err) {
             shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
@@ -183,8 +197,6 @@ function newAdItem (req, res, adid, newAdItems) {
 
     itemsToInsert = newAdItems
 
-    shared.logger.log('newAdItem', 'From: ' + req.ip)
-
     // {
     //     userid: req.user_token.userid,
     //     description: description,
@@ -207,7 +219,7 @@ function deleteAd (req, res) {
     if (req.user_token) {
         var adid = req.body.adid || null
 
-        shared.logger.log('deleteAd', 'From: ' + req.ip)
+        shared.logger.log('deleteAd', 'From user ' + req.user_token.username)
 
         if ( !isNaN(parseInt(adid)) ) {
             Ad.findOne({
@@ -218,12 +230,12 @@ function deleteAd (req, res) {
             }).then(function (ad) {
                 if (ad) {
                     ad.set('deleted', 1)
-
                     return ad.save()
                 } else {
                     res.status(404).json({success: false, message: 'Couldn\'t verify your integrity.'})
                 }
             }).then(function (update) {
+                shared.logger.log('deleteAd', 'Deleted ad "' + update.get('adname') + '" for user ' + req.user_token.username)
                 res.json(update)
             }).catch(function (err) {
                 shared.logger.log('deleteAd', 'From: ' + req.ip + '. ' + err, 'error')

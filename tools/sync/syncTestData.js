@@ -8,11 +8,16 @@ models.university.create({
     latitude: 10.442419,
 }).then(function (res) {
     console.log('CREATED University ' + res.get('universityname'))
+    return models.campus.create({
+        campusname: 'Vestfold',
+        universityid: res.get('universityid')
+    })
+}).then(function (res) {
+    console.log('CREATED Campus ' + res.get('campusname'))
     return models.course.create({
         coursename: 'Informasjonssystemer og IT-ledelse',
-        universityid: 1
+        campusid: res.get('campusid')
     })
-
 }).then(function (res) {
     console.log('CREATED Course ' + res.get('coursename'))
     return models.user.create({
@@ -28,9 +33,10 @@ models.university.create({
 }).then(function (res) {
     console.log('CREATED User ' + res.get('username'))
     return models.ad.create({
-        userid: 1,
-        universityid: 1,
+        userid: res.get('userid'),
+        // universityid: 1,
         courseid: 1,
+        // campusid: 1,
         adname: 'Et utvalg bøker',
         text: 'Prisen kan diskuteres, men det er et ganske godt avslag så går ikke veldig under.',
     })
@@ -41,21 +47,21 @@ models.university.create({
         {
             userid: 1,
             universityid: 1,
-            adid: 1,
+            adid: res.get('adid'),
             price: '200',
             text: 'IT-Strategi',
             description: 'av Petter Gottschalk',
         }, {
             userid: 1,
             universityid: 1,
-            adid: 1,
+            adid: res.get('adid'),
             price: '250',
             text: 'Objektorientert programmering',
             description: 'av Viggo Holmstedt',
         }, {
             userid: 1,
             universityid: 1,
-            adid: 1,
+            adid: res.get('adid'),
             price: '149',
             text: 'Ringenes Herre 3',
             description: 'av Tolkien ellerno',
@@ -64,8 +70,8 @@ models.university.create({
 
 }).then(function (res) {
     console.log('CREATED AdItems')
+}).then(function (questionmark) {
+    console.log('FINISHED SYNCING TEST DATA')
 }).catch(function (err) {
     console.log(err)
 })
-
-console.log('FINISHED SYNCING TEST DATA')
