@@ -6,6 +6,25 @@ var logger          = require('../tools/logger.js'),
     randomstring    = require('randomstring'),
     nodemailer      = require('nodemailer')
 
+function sendMail (subject, email, body) {
+    // send epost med en passordlenke
+    let transport = mailTransporter(),
+        opts      = {
+            from: config.email.defaults.from,
+            to: email,
+            subject: subject,
+            html: body
+        }
+
+    transport.sendMail(opts, function (err, info) {
+        if (err) {
+            logger.log('sendMail', 'Unable to send email to ' + email + ': ' + err, 'error')
+            console.log(err)
+        }
+        logger.log('sendMail', 'Successfully sent email to ' + email + '. ' + info)
+    })
+}
+
 function verifyToken (token, cb, err) {
     if (token) {
         jwt.verify(token, config.security.secret, function (err, verified_token) {
@@ -89,5 +108,5 @@ module.exports = {
     config: config,
     bcrypt: bcrypt,
     randomstring: randomstring,
-    getMailTransporter: mailTransporter
+    sendMail: sendMail,
 }

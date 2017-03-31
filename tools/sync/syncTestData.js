@@ -22,21 +22,29 @@ models.university.create({
     console.log('CREATED Course ' + res.get('coursename'))
     return models.user.create({
         courseid: 1,
-        universityid: 1,
         username: 'biggiesmalls',
         passphrase: '$2a$10$/mV5CtmwMGkeZMtEl2j71uyLtKZ7LQ5mY6fRtMUfp7puVtTD4ar6i',
-        email: 'biggie.smalls@gmail.com',
+        email: 'nichiatu@gmail.com',
         phone: 95281000,
         firstname: 'Biggie',
         lastname: 'Smalls',
+    })
+}).then(function () {
+    return models.user.create({
+        courseid: 1,
+        username: 'nictorgersen',
+        passphrase: '$2a$10$/mV5CtmwMGkeZMtEl2j71uyLtKZ7LQ5mY6fRtMUfp7puVtTD4ar6i',
+        email: 'nichlas.torgersen@gmail.com',
+        phone: 95281000,
+        firstname: 'Nic',
+        lastname: 'Tor',
+        isadmin: 1,
     })
 }).then(function (res) {
     console.log('CREATED User ' + res.get('username'))
     return models.ad.create({
         userid: res.get('userid'),
-        // universityid: 1,
         courseid: 1,
-        // campusid: 1,
         adname: 'Et utvalg bøker',
         text: 'Prisen kan diskuteres, men det er et ganske godt avslag så går ikke veldig under.',
     })
@@ -72,6 +80,7 @@ models.university.create({
     console.log('CREATED AdItems')
 }).then(function (questionmark) {
     console.log('FINISHED SYNCING TEST DATA')
+    console.log('CLOSING CONNECTION')
 }).catch(function (err) {
     console.log(err)
 })

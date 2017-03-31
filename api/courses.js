@@ -1,25 +1,37 @@
 var shared      = require('./_shared'),
     Course      = shared.models.course,
-    University  = shared.models.university
+    University  = shared.models.university,
+    Campus      = shared.models.campus
 
 function getCourses (req, res) {
     var query,
-        universityid = parseInt(req.query.universityid) || false,
+        campusid = parseInt(req.query.campusid) || null,
+        courseid = parseInt(req.query.courseid) || null,
         findOpts = {
             include: [
                 {
-                    model: University,
+                    model: Campus,
+                    include: [
+                        {
+                            model: University
+                        }
+                    ]
                 }
             ],
+            where: {},
         }
 
     shared.logger.log('getCourses', 'From: ' + req.ip)
 
-    if (universityid) {
-        findOpts.where = {
-            'universityid': universityid
-        }
+    if (courseid) {
+        findOpts.where['courseid'] = courseid
     }
+
+    if (campusid) { // campusid har presedens
+        findOpts.where = {campusid: campusid}
+    }
+
+    console.log(findOpts)
 
     Course.findAll(findOpts)
     .then(function (courses) {

@@ -27,7 +27,8 @@ function verifyResetCode (req, res) {
 }
 
 function initiateReset (req, res) {
-    var q = req.body
+    var q       = req.body,
+        subject = 'Boknaden: Reset passord'
 
     if (q.username) {
         User.findOne({
@@ -41,8 +42,8 @@ function initiateReset (req, res) {
         }).then(function (user) {
 
             if (!user) {
-                res.json({success: true}) // vi sender success: true selvom brukeren ikke fins,
-                                          // fordi passord reset kan benyttes for å undersøke hvilke brukere som finnes i databasen
+                return res.json({success: true}) // vi sender success: true selvom brukeren ikke fins,
+                                                 // fordi passord reset kan benyttes for å undersøke hvilke brukere som finnes i databasen
             }
 
             PasswordReset.findOne({
@@ -59,7 +60,15 @@ function initiateReset (req, res) {
                         userid: user.get('userid'),
                         code: rndStr
                     }).then(function (prC) {
-                        sendMail(user.get('email'), rndStr)
+                        shared.sendMail(
+                            subject,
+                            user.get('email'),
+                            '<h2>Boknaden</h2>' +
+                            '<p>Du har bedt om å resette passordet ditt hos Boknaden. Dersom det ikke var deg som ba om dette, slett denne mailen snarest.</p>'+
+                            '<a href="' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '">Tilbakestill her</a>' +
+                            '<p>Fungerer ikke lenken? Lim denne inn i søkefeltet på nettleseren: ' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '</p>'
+                        )
+
                         res.json({success: true})
                     }).catch(function (err) {
                         shared.logger.log('initiateReset', 'Password reset from: ' + req.ip + '. ' + err, 'error')
@@ -68,7 +77,14 @@ function initiateReset (req, res) {
                     })
 
                 } else {
-                    sendMail(user.get('email'), pr.get('code'))
+                    shared.sendMail(
+                        subject,
+                        user.get('email'),
+                        '<h2>Boknaden</h2>' +
+                        '<p>Du har bedt om å resette passordet ditt hos Boknaden. Dersom det ikke var deg som ba om dette, slett denne mailen snarest.</p>'+
+                        '<a href="' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '">Tilbakestill her</a>' +
+                        '<p>Fungerer ikke lenken? Lim denne inn i søkefeltet på nettleseren: ' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '</p>'
+                    )
 
                     res.json({success: true})
                 }
@@ -86,25 +102,6 @@ function initiateReset (req, res) {
     } else {
         res.status(404).json({success: false, message: 'More parameters are needed.'})
     }
-}
-
-function sendMail (email, code) {
-    // send epost med en passordlenke
-    let transport = shared.getMailTransporter(),
-        opts      = {
-            from: shared.config.email.defaults.from,
-            to: email,
-            subject: 'Boknaden: Reset passord',
-            html: '<h2>Boknaden</h2><p>Du har bedt om å resette passordet ditt hos Boknaden. Dersom det ikke var deg som ba om dette, slett denne mailen snarest.</p><a>' + code + '</a>'
-        }
-
-    transport.sendMail(opts, function (err, info) {
-        if (err) {
-            shared.logger.log('sendMail', 'Unable to send email to ' + email + ': ' + err, 'error')
-            console.log(err)
-        }
-        shared.logger.log('sendMail', 'Successfully sent email to ' + email + '. ' + info)
-    })
 }
 
 module.exports = {

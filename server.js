@@ -42,6 +42,13 @@ function registerEndpoint(app, routePath, filePath) {
                             req.user_token = null
                         }
 
+                        if (!verified_token) {
+                            return res.status(403).send({
+                                success: false,
+                                message: 'This token is not valid.'
+                            })
+                        }
+
                         req.user_token = verified_token
 
                         return next()

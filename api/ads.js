@@ -10,6 +10,8 @@ var shared      = require('./_shared.js'),
 function getAds (req, res) {
     var q           = req.query,
         campus      = parseInt(q.campusid) || null,
+        course      = parseInt(q.courseid) || null,
+        university  = parseInt(q.universityid) || null,
         limit       = parseInt(q.limit) || 20,
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit,
@@ -26,9 +28,18 @@ function getAds (req, res) {
         userAttributes.push('email')
     }
 
+    if (course) {
+        suppliedWhere['courseid'] = course
+    }
+
     if (campus) {
         suppliedWhere['campusid'] = campus
     }
+
+    if (university) {
+        suppliedWhere['universityid'] = university
+    }
+
 
     if (q.adid && typeof parseInt(q.adid) === 'number') {
         Ad.findOne({

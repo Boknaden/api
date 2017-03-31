@@ -1,6 +1,9 @@
 var shared  = require('./_shared.js'),
     bcrypt  = require('bcrypt'),
-    User    = shared.models.user
+    User    = shared.models.user,
+    Course  = shared.models.course
+    Campus  = shared.models.campus,
+    University = shared.models.university
 
 function authenticate (req, res) {
     var username     = req.body.username,
@@ -10,12 +13,13 @@ function authenticate (req, res) {
 
     User.findOne({
         attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin"],
-        where: {
-            $or: [
-                {username: username},
-                {email: username}
-            ]
-        }
+        where: { $or: [ {username: username}, {email: username} ] },
+        include: [
+            { model: Course, include: [
+                { model: Campus, include: [
+                    { model: University } ]
+                } ]
+            } ]
     }).then(function (user) {
         if (user) {
             // hashing av passord ved hjelp av blowfishalgoritmen
@@ -31,11 +35,10 @@ function authenticate (req, res) {
 
                 if (!authed) {
                     shared.logger.log('authenticate', 'Login attempt for ' + user.get('username') + ' failed.')
-                    res.status(401).json({
+                    return res.status(401).json({
                         success: false,
                         message: 'Feil brukernavn eller passord.' // av sikkerhetsmessige grunner røper vi ikke hvilken del av nøklene som er feil
                     })
-                    return
                 }
 
                 shared.logger.log('authenticate', 'User ' + user.get('username') + ' authenticated.')
@@ -44,7 +47,7 @@ function authenticate (req, res) {
                     expiresIn: req.boknaden.config.security.tokenExpiration,
                 })
 
-                res.json({
+                return res.json({
                     success: true,
                     token: token,
                 })
@@ -59,7 +62,7 @@ function authenticate (req, res) {
     }).catch(function (err) {
         shared.logger.log('authenticate', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
-        res.json({err: 'Error happened while processing authentication'})
+        return res.json({err: 'Error happened while processing authentication'})
     })
 }
 
