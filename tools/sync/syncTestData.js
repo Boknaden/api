@@ -8,18 +8,35 @@ models.university.create({
     latitude: 10.442419,
 }).then(function (res) {
     console.log('CREATED University ' + res.get('universityname'))
+
     return models.campus.create({
         campusname: 'Vestfold',
         universityid: res.get('universityid')
     })
 }).then(function (res) {
     console.log('CREATED Campus ' + res.get('campusname'))
+
     return models.course.create({
         coursename: 'Informasjonssystemer og IT-ledelse',
         campusid: res.get('campusid')
     })
 }).then(function (res) {
     console.log('CREATED Course ' + res.get('coursename'))
+
+    return models.campus.create({
+        campusname: 'Bø',
+        universityid: 1
+    })
+}).then(function (res) {
+    console.log('CREATED Campus ' + res.get('campusname'))
+
+    return models.course.create({
+        coursename: 'Eiendomsmegling',
+        campusid: res.get('campusid')
+    })
+}).then(function (res) {
+    console.log('CREATED Course ' + res.get('coursename'))
+
     return models.user.create({
         courseid: 1,
         username: 'biggiesmalls',
@@ -29,7 +46,9 @@ models.university.create({
         firstname: 'Biggie',
         lastname: 'Smalls',
     })
-}).then(function () {
+}).then(function (res) {
+    console.log('CREATED User ' + res.get('username'))
+
     return models.user.create({
         courseid: 1,
         username: 'nictorgersen',
@@ -42,6 +61,7 @@ models.university.create({
     })
 }).then(function (res) {
     console.log('CREATED User ' + res.get('username'))
+
     return models.ad.create({
         userid: res.get('userid'),
         courseid: 1,

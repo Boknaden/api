@@ -1,51 +1,61 @@
 var shared  = require('./_shared.js'),
     bcrypt  = shared.bcrypt,
-    User    = shared.models.user
+    User    = shared.models.user,
+    Ad      = shared.models.ad,
+    AdItem  = shared.models.aditem,
+    Image   = shared.models.image,
+    Course  = shared.models.course,
+    Campus  = shared.models.campus,
+    University = shared.models.university
 
 function getUsers (req, res) {
     shared.logger.log('getUsers', "From: " + req.ip)
 
-    let atts    = ["userid", "username", "firstname", "lastname"],
-        token   = req.headers['boknaden-verify'] || false
+    let atts = ["userid", "username", "firstname", "lastname"]
 
-    shared.verifyToken(token, (verified) => {
-        token = verified
+    if (req.user_token) {
+        atts.push("email")
+    }
 
-        if (token) {
-            atts.push("email")
-        }
-
-        if (req.query.userid) {
-            User.findOne({
-                attributes: atts,
-                include: [],
-                where: {
-                    userid: parseInt(req.query.userid)
-                }
-            }).then(function (user) {
-                res.json(user)
-            }).catch(function (err) {
-                shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
-                console.log(err)
-                res.status(404).send({err: 'An error happened'})
-            })
-            return
-        }
-
-        User.findAll({
+    if (req.query.username) {
+        return User.findOne({
             attributes: atts,
-        }).then(function (users) {
-            res.json(users)
+            include: [
+                {
+                    model: Ad,
+                    include: [{ model: AdItem }, {
+                        model: Course,
+                        include: [{
+                            model: Campus,
+                            include: [{
+                                model: University
+                            }]
+                        }]
+                    }]
+                }
+            ],
+            where: {
+                username: req.query.username
+            }
+        }).then(function (user) {
+            res.json(user)
         }).catch(function (err) {
             shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
             console.log(err)
             res.status(404).send({err: 'An error happened'})
         })
+    }
 
-    }, (err) => {
+    return User.findAll({
+        attributes: atts,
+    }).then(function (users) {
+        res.json(users)
+    }).catch(function (err) {
         shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
+        console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
+
 }
 
 function newUser (req, res) {

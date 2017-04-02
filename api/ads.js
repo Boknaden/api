@@ -9,14 +9,15 @@ var shared      = require('./_shared.js'),
 
 function getAds (req, res) {
     var q           = req.query,
-        campus      = parseInt(q.campusid) || null,
         course      = parseInt(q.courseid) || null,
+        campus      = parseInt(q.campusid) || null,
         university  = parseInt(q.universityid) || null,
         limit       = parseInt(q.limit) || 20,
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit,
 
         suppliedWhere  = {deleted: 0},
+        extraWhere     = {}
         userAttributes = ['username', 'firstname', 'lastname']
 
     shared.logger.log('getAds', 'From: ' + req.ip)
@@ -32,14 +33,14 @@ function getAds (req, res) {
         suppliedWhere['courseid'] = course
     }
 
-    if (campus) {
-        suppliedWhere['campusid'] = campus
-    }
-
-    if (university) {
-        suppliedWhere['universityid'] = university
-    }
-
+    // TODO: fix this shit
+    // if (campus) {
+    //     extraWhere['campusid'] = campus
+    // }
+    //
+    // if (university) {
+    //     extraWhere['universityid'] = university
+    // }
 
     if (q.adid && typeof parseInt(q.adid) === 'number') {
         Ad.findOne({
@@ -64,7 +65,7 @@ function getAds (req, res) {
                         model: Campus,
                         include: [
                             {
-                                model: University
+                                model: University,
                             }
                         ]
                     }
@@ -85,6 +86,8 @@ function getAds (req, res) {
         return
     }
 
+
+
     Ad.findAndCountAll({
         limit: limit,
         offset: offset,
@@ -103,12 +106,17 @@ function getAds (req, res) {
                 ]
             }, {
                 model: Course,
+                required: true,
                 include: [
                     {
                         model: Campus,
+                        required: true,
+                        where: (campus) ? { campusid: campus } : {},
                         include: [
                             {
-                                model: University
+                                model: University,
+                                required: true,
+                                where: (university) ? { universityid: university } : {},
                             }
                         ]
                     }

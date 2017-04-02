@@ -31,8 +31,6 @@ function getCourses (req, res) {
         findOpts.where = {campusid: campusid}
     }
 
-    console.log(findOpts)
-
     Course.findAll(findOpts)
     .then(function (courses) {
         res.json(courses)
