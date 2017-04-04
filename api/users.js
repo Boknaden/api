@@ -17,6 +17,21 @@ function getUsers (req, res) {
         atts.push("email")
     }
 
+    if (req.query.verificationcode) {
+        return User.findOne({
+            attributes: ["username"],
+            where: {
+                verificationcode: req.query.verificationcode
+            }
+        }).then(function (user) {
+            if (user) {
+                return res.json({success: true, message: 'Verification code valid.'})
+            }
+
+            return res.json({success: false})
+        })
+    }
+
     if (req.query.username) {
         return User.findOne({
             attributes: atts,
@@ -35,7 +50,8 @@ function getUsers (req, res) {
                 }
             ],
             where: {
-                username: req.query.username
+                username: req.query.username,
+                verified: 1
             }
         }).then(function (user) {
             res.json(user)
@@ -48,6 +64,9 @@ function getUsers (req, res) {
 
     return User.findAll({
         attributes: atts,
+        where: {
+            verified: 1
+        }
     }).then(function (users) {
         res.json(users)
     }).catch(function (err) {
@@ -93,7 +112,16 @@ function newUser (req, res) {
                     lastname: req.body.lastname.trim(),
                     courseid: parseInt(req.body.courseid),
                     universityid: 1,
+                    verificationcode: shared.uuid(),
                 }).then(function (user) {
+                    shared.sendMail(
+                        'Velkommen som bruker hos Boknaden!',
+                        user.get('email'),
+                        '<h1>Velkommen som bruker hos Boknaden!</h1>' +
+                        '<p>For å være sikker på at du er en nogenlunde ekte person, '+
+                        'vennligst verifiser e-posten din ved å kopiere <strong>' + process.env.INTERNAL_IP + ':3000/#!/verify/' + user.get('verificationcode') +
+                        '</strong> inn i nettlseren din.</p>'
+                    )
                     res.json(user)
                 }).catch(function (err) {
                     console.log(err)
@@ -102,7 +130,7 @@ function newUser (req, res) {
                 })
             })
         } else {
-            res.json({err: "User already exists."})
+            res.json({err: "Username or email already exists."})
         }
 
     }).catch(function (err) {

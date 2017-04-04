@@ -77,6 +77,16 @@ function getAds (req, res) {
                 return
             }
 
+            if (req.user_token) {
+                if (parseInt(ad.get('userid')) === parseInt(req.user_token.userid)) {
+                    ad.dataValues['isowner'] = true
+                }
+            } else {
+                ad.dataValues['isowner'] = false
+            }
+
+
+
             res.json(ad)
         }).catch(function (err) {
             shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')

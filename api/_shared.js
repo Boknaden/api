@@ -4,7 +4,8 @@ var logger          = require('../tools/logger.js'),
     models          = require('../models.js'),
     bcrypt          = require('bcrypt'),
     randomstring    = require('randomstring'),
-    nodemailer      = require('nodemailer')
+    nodemailer      = require('nodemailer'),
+    uuid            = require('uuid/v4')
 
 function sendMail (subject, email, body) {
     // send epost med en passordlenke
@@ -109,4 +110,5 @@ module.exports = {
     bcrypt: bcrypt,
     randomstring: randomstring,
     sendMail: sendMail,
+    uuid: uuid,
 }
