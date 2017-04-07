@@ -29,6 +29,7 @@ function getVerifyUser (req, res) {
 }
 
 function verifyUser (req, res) {
+    shared.logger.log('verifyUser', 'From: ' + req.ip)
     if (req.body.verificationcode) {
         return User.findOne({
             attributes: ["userid", "username", "verified"],
@@ -39,10 +40,14 @@ function verifyUser (req, res) {
             if (user) {
                 user.set('verified', 1)
                 user.save()
+                shared.logger.log('verifyUser', 'Verification for user ' + user.get('username') + '.')
                 return res.json({success: true, message: 'User successfully verified.'})
             }
 
             return res.json({success: false})
+        }).catch(function (err) {
+            shared.logger.log('verifyUser', 'Verification failed for ' + req.body.verificationcode + '. ' + err, 'error')
+            return res.json({success: false, message: 'An error happened.'})
         })
     }
 }
