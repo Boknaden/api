@@ -12,7 +12,7 @@ function authenticate (req, res) {
     shared.logger.log('authenticate', 'IP: ' + req.ip + ' trying to authenticate.')
 
     User.findOne({
-        attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin"],
+        attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin", "verified"],
         where: { $or: [ {username: username}, {email: username} ] },
         include: [
             { model: Course, include: [
@@ -43,7 +43,18 @@ function authenticate (req, res) {
 
                 shared.logger.log('authenticate', 'User ' + user.get('username') + ' authenticated.')
 
-                var token = req.service.jwt.sign(user.dataValues, req.boknaden.config.security.secret, {
+                var userObject = {
+                    userid: user.get('userid'),
+                    username: user.get('username'),
+                    email: user.get('email'),
+                    verified: user.get('verified'),
+                    firstname: user.get('firstname'),
+                    lastname: user.get('lastname'),
+                    course: user.get('course'),
+                    isadmin: user.get('isadmin'),
+                }
+
+                var token = req.service.jwt.sign(userObject, req.boknaden.config.security.secret, {
                     expiresIn: req.boknaden.config.security.tokenExpiration,
                 })
 

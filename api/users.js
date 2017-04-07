@@ -29,6 +29,10 @@ function getUsers (req, res) {
             }
 
             return res.json({success: false})
+        }).catch(function (err) {
+            shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
+            console.log(err)
+            res.status(404).send({err: 'An error happened'})
         })
     }
 
@@ -38,6 +42,7 @@ function getUsers (req, res) {
             include: [
                 {
                     model: Ad,
+                    order: 'createddate DESC',
                     include: [{ model: AdItem }, {
                         model: Course,
                         include: [{
