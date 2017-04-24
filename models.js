@@ -77,6 +77,8 @@ var AdItem = sequelize.define('aditem', {
     description: { type: Sequelize.TEXT, allowNull: true },
     isbn: { type: Sequelize.STRING(13), allowNull: true },
     deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
+    active: { type: Sequelize.INTEGER, defaultValue: 1, allowNull: false },
+    buyerid: { type: Sequelize.INTEGER, allowNull: true }
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -105,7 +107,7 @@ var Interested = sequelize.define('interested', {
         primaryKey: true
     },
     userid: { type: Sequelize.INTEGER, allowNull: false },
-    adid: { type: Sequelize.INTEGER, allowNull: false },
+    aditemid: { type: Sequelize.INTEGER, allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',
@@ -208,8 +210,10 @@ var PasswordReset = sequelize.define('passwordreset', {
 
 User.hasMany(Ad, { foreignKey: 'userid' })
 User.hasMany(AdItem, { foreignKey: 'userid' })
+User.hasMany(AdItem, { foreignKey: 'buyerid' })
 User.hasMany(Image, { foreignKey: 'userid' })
 User.hasMany(PasswordReset, { foreignKey: 'userid' })
+User.hasMany(Interested, { foreignKey: 'userid' })
 User.belongsTo(Course, { foreignKey: 'courseid' })
 
 University.hasMany(Ad, { foreignKey: 'universityid' })
@@ -227,9 +231,14 @@ Ad.hasMany(AdItem, { foreignKey: 'adid' })
 Ad.belongsTo(User, { foreignKey: 'userid' })
 Ad.belongsTo(Course, { foreignKey: 'courseid' })
 
+AdItem.hasMany(Interested, { foreignKey: 'aditemid' })
 AdItem.belongsTo(Ad, { foreignKey: 'adid', onDelete: 'cascade' })
 AdItem.belongsTo(User, { foreignKey: 'userid' })
+AdItem.belongsTo(User, { foreignKey: 'buyerid' })
 AdItem.belongsTo(Image, { foreignKey: 'imageid' })
+
+Interested.belongsTo(AdItem, { foreignKey: 'aditemid' })
+Interested.belongsTo(User, { foreignKey: 'userid' })
 
 Image.belongsTo(User, { foreignKey: 'userid' })
 Image.hasMany(AdItem, { foreignKey: 'imageid' })

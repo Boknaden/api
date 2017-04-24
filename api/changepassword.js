@@ -24,11 +24,15 @@ function changePassword (req, res) {
 }
 
 function changePasswordLoggedInUser (req, res, token) {
-    var newPassphrase = req.body.passphrase || false
+    var newPassphrase = req.body.passphrase || false,
+        oldPassphrase = req.body.oldpassphrase || false
+
+    if (!oldPassphrase) {
+        return res.status(404).json({success: false, message: 'Needs more parameters.'})
+    }
 
     if (!newPassphrase) {
-        res.status(404).json({success: false, message: 'Needs more parameters.'})
-        return
+        return res.status(404).json({success: false, message: 'Needs more parameters.'})
     }
 
     User.findOne({
@@ -37,18 +41,27 @@ function changePasswordLoggedInUser (req, res, token) {
         }
     }).then(function (userRes) {
         if (userRes) {
-            shared.bcrypt.hash(newPassphrase, shared.config.security.saltRounds, (err, hash) => {
-                if (err) {
-                    shared.logger.log('changePasswordLoggedInUser', 'Error happened while hashing password, ' + token.username + '. ' + err, 'error')
-                    console.log(err)
-                    res.status(500).json({success: false, message: 'An error happened.'})
-                    return
-                }
+            shared.bcrypt.compare(oldPassphrase, userRes.get('passphrase'), function (err, res) {
+                if (res) {
 
-                userRes.set('passphrase', hash)
-                return userRes.save()
+                    shared.bcrypt.hash(newPassphrase, shared.config.security.saltRounds, (err, hash) => {
+                        if (err) {
+                            shared.logger.log('changePasswordLoggedInUser', 'Error happened while hashing password, ' + token.username + '. ' + err, 'error')
+                            console.log(err)
+                            res.status(500).json({success: false, message: 'An error happened.'})
+                            return
+                        }
+
+                        userRes.set('passphrase', hash)
+                        return userRes.save()
+                    })
+                    return res.json({success: true, message: 'Updated password.'})
+
+                } else {
+                    return res.json({success: false, message: 'You gotta input your old password correctly man'})
+                }
             })
-            res.json({success: true, message: 'Updated password.'})
+
         }
     }).then(function (update) { // on userRes.save()
         if (update)

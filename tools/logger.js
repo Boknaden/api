@@ -14,6 +14,8 @@ function log (loggedfrom, message, state) {
         message: message,
         state: state,
     })
+
+    console.log(message)
 }
 
 function logSequelize(message) {

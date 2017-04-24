@@ -127,7 +127,7 @@ function newUser (req, res) {
                         'vennligst verifiser e-posten din ved å kopiere <strong>' + process.env.INTERNAL_IP + ':3000/verify/' + user.get('verificationcode') +
                         '</strong> inn i nettlseren din.</p>'
                     )
-                    res.json(user)
+                    return res.json(user)
                 }).catch(function (err) {
                     console.log(err)
                     shared.logger.log('newUser', 'From: ' + req.ip + ". " + err, 'error')

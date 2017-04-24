@@ -58,6 +58,7 @@ models.university.create({
         firstname: 'Nic',
         lastname: 'Tor',
         isadmin: 1,
+        verified: 1,
     })
 }).then(function (res) {
     console.log('CREATED User ' + res.get('username'))
