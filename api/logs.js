@@ -42,14 +42,14 @@ function getLogs (req, res) {
                 res.json(payload)
 
             }).catch(function (err) {
-                shared.logger.log('getLogs', 'From: ' + req.ip + '. ' + err, 'error')
+                shared.logger.log('getLogs', 'From: ' + req.user_token.username + '. ' + err, 'error')
             })
 
         }).catch(function (err) {
-            shared.logger.log('getLogs', 'From: ' + req.ip + '. ' + err, 'error')
+            shared.logger.log('getLogs', 'From: ' + req.user_token.username + '. ' + err, 'error')
         })
     } else {
-        shared.logger.log('getLogs', 'Someone is trying to access the logs with their invalid token.')
+        shared.logger.log('getLogs', req.user_token.username + ' is trying to access the logs with their invalid token.')
         res.status(401).json({
             message: 'What are you trying to do? :)',
             success: false,

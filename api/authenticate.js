@@ -9,8 +9,6 @@ function authenticate (req, res) {
     var username     = req.body.username,
         passphrase   = req.body.passphrase
 
-    shared.logger.log('authenticate', 'IP: ' + req.ip + ' trying to authenticate.')
-
     User.findOne({
         attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin", "verified"],
         where: { $or: [ {username: username}, {email: username} ] },

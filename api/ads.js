@@ -20,7 +20,6 @@ function getAds (req, res) {
         extraWhere     = {}
         userAttributes = ['username', 'firstname', 'lastname']
 
-    shared.logger.log('getAds', 'From: ' + req.ip)
     if (q.userid && !isNaN(parseInt(q.userid))) {
         suppliedWhere.userid = q.userid
     }
@@ -154,10 +153,6 @@ function newAd (req, res) {
         course          = parseInt(q.courseid),
         valuesNotEmpty  = shared.checkEmptyValues(q, fields),
         aditems         = q.aditems
-
-    shared.logger.log('newAd', 'From: ' + req.ip)
-
-    console.log(q)
 
     if (q.hasOwnProperty('adid')) {
         newAdItem(req, res)
