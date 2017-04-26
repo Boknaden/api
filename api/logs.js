@@ -3,8 +3,19 @@ var shared      = require('./_shared'),
 
 function getLogs (req, res) {
     let isadmin,
-        limit = req.query.limit || 20,
-        offset = req.query.offset || 0
+        page = req.query.page || 1,
+        limit = 20,
+        offset = limit * (page - 1),
+        type = req.query.type || false,
+        where = {}
+
+    /*
+    offset = limit - (limit * page)
+    */
+
+    if (type) {
+        where['state'] = type
+    }
 
     if (req.hasOwnProperty('user_token')) {
         isadmin = req.user_token.isadmin
@@ -12,18 +23,28 @@ function getLogs (req, res) {
 
     if (isadmin || parseInt(process.env.DEBUG) === 1) {
         Log.findAndCountAll({
-            limit: 20,
-            offset: 0,
-            order: 'createddate DESC'
+            limit: limit,
+            offset: offset,
+            order: 'createddate DESC',
+            where: where
         })
         .then(function (logs) {
-            var payload = {
-                limit: limit,
-                offset: offset,
-                count: logs.rows.length,
-                logs: logs.rows,
-            }
-            res.json(payload)
+            Log.count({
+                where: where
+            }).then(function (count) {
+
+                var payload = {
+                    limit: limit,
+                    offset: offset,
+                    logs: logs.rows,
+                    total: count,
+                }
+                res.json(payload)
+
+            }).catch(function (err) {
+                shared.logger.log('getLogs', 'From: ' + req.ip + '. ' + err, 'error')
+            })
+
         }).catch(function (err) {
             shared.logger.log('getLogs', 'From: ' + req.ip + '. ' + err, 'error')
         })
