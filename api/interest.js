@@ -41,7 +41,7 @@ function newInterest (req, res) {
                 message: 'Successfully created interest for aditem ' + aditem.text
             })
         }).catch(function (err) {
-            shared.logger.log('newInterest', 'New interest created by ' + user.username + ' threw error ' + err)
+            shared.logger.log('newInterest', 'New interest created by ' + user.username + ' threw error ' + err, 'error')
             res.status(500).json({
                 success: false,
                 message: 'An error happened'

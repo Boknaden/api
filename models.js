@@ -212,6 +212,9 @@ User.hasMany(Ad, { foreignKey: 'userid' })
 User.hasMany(AdItem, { foreignKey: 'userid' })
 User.hasMany(AdItem, { foreignKey: 'buyerid' })
 User.hasMany(Image, { foreignKey: 'userid' })
+User.hasMany(Chat, { foreignKey: 'initiatorid' })
+User.hasMany(Chat, { foreignKey: 'recipientid' })
+User.hasMany(ChatMessage, { foreignKey: 'userid' })
 User.hasMany(PasswordReset, { foreignKey: 'userid' })
 User.hasMany(Interested, { foreignKey: 'userid' })
 User.belongsTo(Course, { foreignKey: 'courseid' })
@@ -243,6 +246,12 @@ Interested.belongsTo(User, { foreignKey: 'userid' })
 Image.belongsTo(User, { foreignKey: 'userid' })
 Image.hasMany(AdItem, { foreignKey: 'imageid' })
 
+Chat.belongsTo(User, { as: 'Initiator', foreignKey: 'initiatorid' })
+Chat.belongsTo(User, { as: 'Recipient', foreignKey: 'recipientid' })
+
+ChatMessage.belongsTo(Chat, { foreignKey: 'chatid' })
+ChatMessage.belongsTo(User, { foreignKey: 'userid' })
+
 PasswordReset.belongsTo(User, { foreignKey: 'userid' })
 
 module.exports = {
@@ -254,6 +263,8 @@ module.exports = {
     university: University,
     campus: Campus,
     interested: Interested,
+    chat: Chat,
+    chatmessage: ChatMessage,
     image: Image,
     log: Log,
     passwordreset: PasswordReset,

@@ -164,26 +164,51 @@ function newAd (req, res) {
         return
     }
 
-    Ad.create({
-        userid: req.user_token.userid,
-        courseid: course,
-        adname: q.adname.trim(),
-        text: q.text || null
-    }).then(function (ad) {
-        shared.logger.log('newAd', 'Created ad for ' + req.user_token.username)
+    User.find({
+        attributes: ['verified'],
+        where: {
+            userid: req.user_token.userid
+        }
+    }).then(function (user) {
+        if (!user) {
+            shared.logger.log('newAd', 'User is spoofing ID?')
 
-        newAdItem(req, res, ad.adid, q.aditems).then(function (aditem) {
-            shared.logger.log('newAdItem', 'Created aditems for ' + req.user_token.username)
-            res.json({message: 'Added aditem with aditems', ad: ad})
-        }).catch(function (err) {
-            shared.logger.log('newAdItem', 'From: ' + req.ip + '. ' + err, 'error')
-            console.log(err)
-            res.status(404).send({err: 'An error happened'})
-        })
+            return res.status(404).json({
+                success: false,
+                message: 'You\'re not even a user.'
+            })
+        }
+        if (user.get('verified') === 1) {
+            Ad.create({
+                userid: req.user_token.userid,
+                courseid: course,
+                adname: q.adname.trim(),
+                text: q.text || null
+            }).then(function (ad) {
+                shared.logger.log('newAd', 'Created ad for ' + req.user_token.username)
+
+                newAdItem(req, res, ad.adid, q.aditems).then(function (aditem) {
+                    shared.logger.log('newAdItem', 'Created aditems for ' + req.user_token.username)
+                    res.json({message: 'Added aditem with aditems', ad: ad})
+                }).catch(function (err) {
+                    shared.logger.log('newAdItem', 'From: ' + req.user_token.username + '. ' + err, 'error')
+                    res.status(404).send({err: 'An error happened'})
+                })
+
+            }).catch(function (err) {
+                shared.logger.log('newAd', 'From: ' + req.ip + '. ' + err, 'error')
+                res.status(404).send({err: 'An error happened'})
+            })
+        } else {
+            shared.logger.log('newAd', 'From ' + req.user_token.username + ', tried to create ad but is not verified.')
+            res.status(404).json({
+                message: 'User is not verified.',
+                success: false,
+            })
+        }
 
     }).catch(function (err) {
-        shared.logger.log('newAd', 'From: ' + req.ip + '. ' + err, 'error')
-        console.log(err)
+        shared.logger.log('newAd', 'From: ' + req.user_token.username + '. ' + err, 'error')
         res.status(404).send({err: 'An error happened'})
     })
 }

@@ -45,6 +45,7 @@ models.university.create({
         phone: 95281000,
         firstname: 'Biggie',
         lastname: 'Smalls',
+        verified: 1,
     })
 }).then(function (res) {
     console.log('CREATED User ' + res.get('username'))
@@ -99,6 +100,28 @@ models.university.create({
 
 }).then(function (res) {
     console.log('CREATED AdItems')
+
+    return models.chat.create({
+        initiatorid: 1,
+        recipientid: 2,
+    })
+
+}).then(function (res) {
+    console.log('CREATED test Chat')
+
+    return models.chatmessage.bulkCreate([
+        { chatid: 1, message: 'Hei, har du den derre boka?', userid: 1 },
+        { chatid: 1, message: 'Nei, solgte den til noen nå nettopp :(', userid: 2 },
+        { chatid: 1, message: 'Ah, ok. Lame. Da får jeg kjøpe den på Brage til flere hundre tusen.', userid: 1 },
+        { chatid: 1, message: 'Kjipern ass... Jaja, lykke til.', userid: 2 },
+        { chatid: 1, message: 'Takk, kan hende jeg må ha en av de andre bøkene dine.', userid: 1 },
+        { chatid: 1, message: 'Trenger egentlig den andre, faktisk.', userid: 1 },
+        { chatid: 1, message: 'Ok, send meg SMS på 95281000 hvis du lurer på noe mer, da!', userid: 2 },
+        { chatid: 1, message: 'Er på skolen i hele dag, og har boka med meg så det er bare å ringe.', userid: 2 },
+        { chatid: 1, message: 'Ok, takk. Er ikke på skolen før i 13-tida, men tar kontakt.', userid: 1 },
+    ])
+}).then(function (res) {
+    console.log('CREATED test ChatMessages')
 }).then(function (questionmark) {
     console.log('FINISHED SYNCING TEST DATA')
     console.log('CLOSING CONNECTION')
