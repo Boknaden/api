@@ -14,8 +14,6 @@ function getCampuses (req, res) {
             ],
         }
 
-    shared.logger.log('getCampuses', 'From: ' + req.ip)
-
     if (universityid) {
         findOpts.where = {
             'universityid': universityid
@@ -24,9 +22,13 @@ function getCampuses (req, res) {
 
     Campus.findAll(findOpts)
     .then(function (campuses) {
-        res.json(campuses)
+        return res.json(campuses)
     }).catch(function (err) {
         shared.logger.log('getCampuses', 'From: ' + req.ip + '. ' + err, 'error')
+        return res.status(500).json({
+            success: false,
+            message: 'An error happened while getting campuses.'
+        })
     })
 }
 
@@ -51,9 +53,7 @@ function newCampus (req, res) {
     //     }
     //     res.send({payload: results})
     // })
-
-    shared.logger.log('newCourse', 'From: ' + req.ip + ". Not implemented.")
-
+    
     res.status(404).send({success: false, message: 'Not implemented'})
 
 }

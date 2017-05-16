@@ -2,12 +2,15 @@ var shared      = require('./_shared'),
     University  = shared.models.university
 
 function getUniversities (req, res) {
-    shared.logger.log('getUniversities', 'From: ' + req.ip)
     University.findAll()
     .then(function (universities) {
-        res.json(universities)
+        return res.json(universities)
     }).catch(function (err) {
         shared.logger.log('getUniversities', 'From: ' + req.ip + ". " + err, 'error')
+        return res.status(500).json({
+            success: false,
+            message: 'An error happened while getting universities.'
+        })
     })
 }
 

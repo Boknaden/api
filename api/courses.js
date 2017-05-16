@@ -21,8 +21,6 @@ function getCourses (req, res) {
             where: {},
         }
 
-    shared.logger.log('getCourses', 'From: ' + req.ip)
-
     if (courseid) {
         findOpts.where['courseid'] = courseid
     }
@@ -33,9 +31,13 @@ function getCourses (req, res) {
 
     Course.findAll(findOpts)
     .then(function (courses) {
-        res.json(courses)
+        return res.json(courses)
     }).catch(function (err) {
         shared.logger.log('getCourses', 'From: ' + req.ip + '. ' + err, 'error')
+        return res.status(500).json({
+            success: false,
+            message: 'An error happened while getting courses.'
+        })
     })
 }
 
@@ -60,8 +62,6 @@ function newCourse (req, res) {
     //     }
     //     res.send({payload: results})
     // })
-
-    shared.logger.log('newCourse', 'From: ' + req.ip + ". Not implemented.")
 
     res.status(404).send({success: false, message: 'Not implemented'})
 
