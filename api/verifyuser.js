@@ -40,7 +40,7 @@ function verifyUser (req, res) {
             if (user) {
                 user.set('verified', 1)
                 user.save()
-                shared.logger.log('verifyUser', 'Verification for user ' + user.get('username') + '.')
+                shared.logger.log('verifyUser', 'Verified user ' + user.get('username') + '.')
                 return res.json({success: true, message: 'User successfully verified.'})
             }
 
