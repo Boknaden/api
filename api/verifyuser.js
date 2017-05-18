@@ -61,21 +61,13 @@ function verifyUser (req, res) {
 }
 
 function resendVerification (req, res) {
-    var user = req.user_token,
-        verified = !!user.verified
-
-    if (verified) {
-        shared.logger.log('resendVerification', user.username + ' is already verified, but tried to resend verification email.', 'notice')
-        return res.json({
-            success: true,
-            message: 'User already verified.',
-        })
-    }
+    var user = req.user_token
 
     User.findOne({
         attributes: ["userid", "username", "email", "verificationcode"],
         where: {
-            userid: user.userid
+            userid: user.userid,
+            verified: 0
         }
     }).then(function (user) {
         if (user) {
@@ -94,12 +86,13 @@ function resendVerification (req, res) {
                 success: true,
                 message: 'Resent verification successfully.'
             })
+        } else {
+            shared.logger.log('resendVerification', 'Did not send verification for user ' + req.user_token.username + ' because he didn\'t exist or is already verified.')
+            return res.json({
+                success: false,
+                message: 'User is either already verified, or doesn\'t exist.'
+            })
         }
-
-        shared.logger.log(
-            'resendVerification',
-            'Failed to send verification for a user with a token where the user doesn\'t exist. User: ' + user.username,
-            'error')
     }).catch(function (err) {
         shared.logger.log('resendVerification', 'Error when sending verification to ' + user.username + '. ' + err, 'error')
         return res.status(500).json({
