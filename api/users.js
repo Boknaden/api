@@ -123,9 +123,9 @@ function newUser (req, res) {
                         'Velkommen som bruker hos Boknaden!',
                         user.get('email'),
                         '<h1>Velkommen som bruker hos Boknaden!</h1>' +
-                        '<p>For å være sikker på at du er en nogenlunde ekte person, '+
-                        'vennligst verifiser e-posten din ved å kopiere <strong>' + process.env.INTERNAL_IP + ':3000/verify/' + user.get('verificationcode') +
-                        '</strong> inn i nettlseren din.</p>'
+                        '<p>For å være sikker på at du er en ekte person, '+
+                        'vennligst verifiser e-posten din ved å kopiere <strong><a href="'+ process.env.INTERNAL_IP + ':3000/verify/' + user.get('verificationcode') +'">' + process.env.INTERNAL_IP + ':3000/verify/' + user.get('verificationcode') +
+                        '</a></strong> inn i nettlseren din.</p>'
                     )
                     return res.json(user)
                 }).catch(function (err) {

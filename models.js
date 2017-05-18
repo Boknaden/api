@@ -248,6 +248,7 @@ Image.hasMany(AdItem, { foreignKey: 'imageid' })
 
 Chat.belongsTo(User, { as: 'Initiator', foreignKey: 'initiatorid' })
 Chat.belongsTo(User, { as: 'Recipient', foreignKey: 'recipientid' })
+Chat.hasMany(ChatMessage, { foreignKey: 'chatid' })
 
 ChatMessage.belongsTo(Chat, { foreignKey: 'chatid' })
 ChatMessage.belongsTo(User, { foreignKey: 'userid' })

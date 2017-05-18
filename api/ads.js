@@ -15,9 +15,12 @@ function getAds (req, res) {
         limit       = parseInt(q.limit) || 20,
         page        = parseInt(q.page) || 1,
         offset      = (page - 1) * limit,
+        type        = q.type || 'list', // 'list' henter alle aditems hvor buyerid er `null`
+                                        // 'seller' henter alle aditems uansett
 
         suppliedWhere  = {deleted: 0},
-        extraWhere     = {}
+        extraWhere     = {},
+        aditemWhere    = {},
         userAttributes = ['username', 'firstname', 'lastname']
 
     if (q.userid && !isNaN(parseInt(q.userid))) {
@@ -30,6 +33,10 @@ function getAds (req, res) {
 
     if (course) {
         suppliedWhere['courseid'] = course
+    }
+
+    if (type === 'list') {
+        aditemWhere['buyerid'] = null
     }
 
     // TODO: fix this shit
@@ -52,6 +59,7 @@ function getAds (req, res) {
                 attributes: userAttributes,
             }, {
                 model: AdItem,
+                where: aditemWhere,
                 include: [
                     {
                         model: Image
@@ -108,6 +116,7 @@ function getAds (req, res) {
                 attributes: userAttributes,
             }, {
                 model: AdItem,
+                where: aditemWhere,
                 include: [
                     {
                         model: Image
@@ -136,7 +145,7 @@ function getAds (req, res) {
         var payload = {
             limit: limit,
             offset: offset,
-            count: ads.rows.length,
+            count: ads.count,
             ads: ads.rows,
         }
         res.json(payload)

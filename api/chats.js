@@ -33,7 +33,8 @@ function getChats (req, res) {
     }).then(function (chats) {
         return res.json({
             success: true,
-            chats: chats,
+            count: chats.count,
+            chats: chats.rows,
             limit: limit,
             page: page,
         })

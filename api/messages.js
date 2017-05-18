@@ -49,7 +49,8 @@ function getChatMessages (req, res) {
             success: true,
             limit: limit,
             page: page,
-            chatMessages: chatMessages
+            count: chatMessages.count,
+            chatMessages: chatMessages.rows,
         })
     }).catch(function (err) {
         shared.logger.log('getChatMessages', 'Couldn\'t get chat messages for ' + req.user_token.username + ': ' + err, 'error')

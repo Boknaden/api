@@ -1,51 +1,97 @@
-var shared     = require('./_shared.js'),
-    Ad         = shared.models.ad,
-    AdItem     = shared.models.aditem,
-    Interested = shared.models.interested
+var shared      = require('./_shared.js'),
+    User        = shared.models.user,
+    Ad          = shared.models.ad,
+    AdItem      = shared.models.aditem,
+    Interested  = shared.models.interested,
+    Chat        = shared.models.chat,
+    ChatMessage = shared.models.chatmessage
+
+/*
+    Kjøper (buyer):
+    - En kjøper vil se alle objekter h*n har meldt interesse for
+    - En kjøper vil opprette en chat med en selger for en vist interesse
+
+    Selger (seller):
+    - En selger vil se alle ads som har meldte interesser
+*/
 
 function getInterests (req, res) {
-    var type = req.query.type || 'stakeholder' // 'seller'
+    var type = req.query.type || 'buyer' // 'seller'
     var userid = req.user_token.userid
 
     switch (type) {
-        case 'stakeholder':
+        case 'buyer':
+            // Finner alle ads, aditems og interesser for en bruker
+            Ad.findAll({
+                include: [{
+                    model: AdItem,
+                    include: [{
+                        model: Interested,
+                        where: {
+                            userid: userid
+                        }
+                    }]
+                }]
+            }).then(function (interests) {
+                var ads = {}
 
+                res.json({
+                    success: true,
+                    interests: interests
+                })
+            }).catch(function (err) {
+                res.status(500).json({
+                    message: 'An error happened',
+                    success: false,
+                })
+            })
 
             break;
         case 'seller':
-            
+            getInterestsForSeller(req, res)
 
             break;
     }
 
-    Interested.findAll({
+}
+
+/*
+    For en selger til å sjekke interesser per ad
+*/
+function getInterestsForSeller (req, res) {
+    var userid = req.user_token.userid,
+        adid   = parseInt(req.query.adid) || null,
+        where = {
+            userid: userid
+        }
+
+    if (adid && Number.isInteger(adid)) {
+        where['adid'] = adid
+    }
+
+    Ad.findAll({
         where: {
             userid: userid
         },
         include: [
             {
                 model: AdItem,
-                include: [ { model: Ad } ]
+                include: [{
+                    model: Interested
+                }]
             }
         ]
-    }).then(function (interest) {
-        res.json({
-            success: true,
-            interests: interest
+    }).then(function (ads) {
+        return res.json({
+            ads: ads
         })
     }).catch(function (err) {
-        res.status(500).json({
-            message: 'An error happened',
+        shared.logger.log('Error while getting ads for ' + req.user_token.username + '. ' + err, 'error')
+        return res.status(500).json({
             success: false,
+            message: 'An error happened.'
         })
     })
-}
-
-function getInterestsForAd (req, res) {
-    var userid = req.user_token.userid,
-        adid   = req.query.adid
-
-
 }
 
 /*
@@ -62,33 +108,96 @@ function getInterestsForAd (req, res) {
     èn Ad av gangen
 */
 function newInterest (req, res) {
-    var aditemids = req.body.aditemids,
-        userid    = req.user_token.userid,
+    var aditems = req.body.aditems,
+        userid  = req.user_token.userid,
+        message = req.body.message,
         cleaned = []
 
-    if (!Array.isArray(aditemids)) {
+    if (!Array.isArray(aditems)) {
         return res.status(404).json({
             success: false,
             message: 'Wrong parameter type.'
         })
     }
 
-    for (var i = 0; i < aditemids.length; i++) {
-        aditemids[i] = parseInt(aditemids[i])
-        if (Number.isInteger(aditemids[i])) {
-            cleaned.push({ userid: userid, aditemid: aditemids[i] })
-        }
+    if (aditems.length === 0) {
+        return res.status(404).json({
+            success: false,
+            message: 'This endpoint requires some items.'
+        })
     }
 
-    return Interested.bulkCreate(cleaned, {
+    for (var i = 0; i < aditems.length; i++) {
+        var item = aditems[i]
+
+        if (typeof item === 'object') {
+            if (item.hasOwnProperty('aditemid')) {
+                item.aditemid = parseInt(item.aditemid)
+                if (Number.isInteger(item.aditemid)) {
+                    cleaned.push({ userid: userid, aditemid: item.aditemid })
+                }
+            }
+        }
+
+    }
+
+    Interested.bulkCreate(cleaned, {
         fields: ['userid', 'aditemid']
     }).then(function (inserted) {
-        res.json({
-            success: true,
-            message: 'Created Interest'
-        })
-    }).catch(function (err) {
 
+        Ad.findOne({
+            include: [
+                {
+                    model: AdItem,
+                    where: {
+                        aditemid: cleaned[0].aditemid
+                    }
+                }, {
+                    model: User,
+                    attributes: ["userid"]
+                }
+            ]
+        }).then(function (ad) {
+
+            Chat.create({
+                initiatorid: userid,
+                recipientid: ad.get('userid'),
+                chatmessages: [{
+                    userid: userid,
+                    message: message
+                }]
+            }, {
+                include: [ ChatMessage ]
+            }).then(function (chat) {
+
+                return res.json({
+                    success: true,
+                    message: 'Created interests for ' + req.user_token.username,
+                    chatid: chat.get('chatid')
+                })
+
+            }).catch(function (err) {
+                shared.logger.log('newInterest', 'Error happened while creating chat for ' + req.user_token.username + '. ' + err, 'error')
+                return res.status(500).json({
+                    success: false,
+                    message: 'An error happened.'
+                })
+            })
+
+        }).catch(function (err) {
+            shared.logger.log('newInterest', 'Error happened while getting ad for interest created by ' + req.user_token.username + '. ' + err, 'error')
+            return res.status(500).json({
+                success: false,
+                message: 'An error happened.'
+            })
+        })
+
+    }).catch(function (err) {
+        shared.logger.log('newInterest', 'Error happened while creating interest for ' + req.user_token.username + '. ' + err, 'error')
+        return res.status(500).json({
+            success: false,
+            message: 'An error happened.'
+        })
     })
 
 }

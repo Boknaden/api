@@ -8,7 +8,6 @@ var logger          = require('../tools/logger.js'),
     uuid            = require('uuid/v4')
 
 function sendMail (subject, email, body) {
-    // send epost med en passordlenke
     let transport = mailTransporter(),
         opts      = {
             from: config.email.defaults.from,
@@ -39,20 +38,6 @@ function verifyToken (token, cb, err) {
     } else {
         cb(false)
     }
-}
-
-function genQuestionMarks (fields) {
-    var qmarks = ""
-
-    for (var i = 0; i < fields.length; i++) {
-        if (i === fields.length - 1) {
-            qmarks += "?"
-        } else {
-            qmarks += "?,"
-        }
-    }
-
-    return qmarks
 }
 
 function checkEmptyValues (values, fields) {
@@ -100,7 +85,6 @@ function mailTransporter () {
 }
 
 module.exports = {
-    genQuestionMarks: genQuestionMarks,
     checkEmptyValues: checkEmptyValues,
     logger: logger,
     models: models,
