@@ -61,12 +61,10 @@ function verifyUser (req, res) {
 }
 
 function resendVerification (req, res) {
-    var user = req.user_token
-
     User.findOne({
-        attributes: ["userid", "username", "email", "verificationcode"],
+        attributes: ["userid", "username", "verified", "email", "verificationcode"],
         where: {
-            userid: user.userid,
+            userid: req.user_token.userid,
             verified: 0
         }
     }).then(function (user) {

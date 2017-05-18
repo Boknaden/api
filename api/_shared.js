@@ -21,7 +21,7 @@ function sendMail (subject, email, body) {
             logger.log('sendMail', 'Unable to send email to ' + email + ': ' + err, 'error')
             console.log(err)
         }
-        logger.log('sendMail', 'Successfully sent email to ' + email + '. ' + info)
+        logger.log('sendMail', 'Successfully sent email to ' + email + '.')
     })
 }
 

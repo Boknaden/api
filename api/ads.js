@@ -29,6 +29,7 @@ function getAds (req, res) {
 
     if (req.user_token) {
         userAttributes.push('email')
+        userAttributes.push('phone')
     }
 
     if (course) {
