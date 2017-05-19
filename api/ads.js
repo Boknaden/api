@@ -7,6 +7,16 @@ var shared      = require('./_shared.js'),
     Campus      = shared.models.campus,
     Image       = shared.models.image
 
+/*
+    Henter Ads basert på filter:
+        - linje
+        - campus
+        - universitet
+        - side (paginering)
+
+    Dersom en adid er supplert henter vi
+    alle aditems for en ad
+*/
 function getAds (req, res) {
     var q           = req.query,
         course      = parseInt(q.courseid) || null,
@@ -27,6 +37,8 @@ function getAds (req, res) {
         suppliedWhere.userid = q.userid
     }
 
+    // dersom brukeren som henter ad er autentisert
+    // får han e-post og telefonnummer til selgeren
     if (req.user_token) {
         userAttributes.push('email')
         userAttributes.push('phone')

@@ -7,6 +7,11 @@ var shared     = require('./_shared.js'),
     Campus     = shared.models.campus,
     University = shared.models.university
 
+/*
+    getAdDataForInterest leverer ad og aditem for "meld interesse"
+    Forskjellen er at dette endepunktet kun viser aditems en bruker
+    ikke allerede har meldt interesse for
+*/
 function getAdDataForInterest (req, res) {
     var adid   = req.query.adid,
         userid = req.user_token.userid
