@@ -17,25 +17,6 @@ function getUsers (req, res) {
         atts.push("email")
     }
 
-    if (req.query.verificationcode) {
-        return User.findOne({
-            attributes: ["username"],
-            where: {
-                verificationcode: req.query.verificationcode
-            }
-        }).then(function (user) {
-            if (user) {
-                return res.json({success: true, message: 'Verification code valid.'})
-            }
-
-            return res.json({success: false})
-        }).catch(function (err) {
-            shared.logger.log('getUsers', 'From: ' + req.ip + ". " + err, 'error')
-            console.log(err)
-            res.status(404).send({err: 'An error happened'})
-        })
-    }
-
     if (req.query.username) {
         return User.findOne({
             attributes: atts,
@@ -79,7 +60,6 @@ function getUsers (req, res) {
         console.log(err)
         res.status(404).send({err: 'An error happened'})
     })
-
 }
 
 function newUser (req, res) {

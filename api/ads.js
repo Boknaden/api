@@ -75,7 +75,8 @@ function getAds (req, res) {
                 where: aditemWhere,
                 include: [
                     {
-                        model: Image
+                        model: Image,
+                        attributes: ['imageurl', 'title']
                     }
                 ]
             }, {
@@ -132,7 +133,8 @@ function getAds (req, res) {
                 where: aditemWhere,
                 include: [
                     {
-                        model: Image
+                        model: Image,
+                        attributes: ['imageurl', 'title']
                     }
                 ]
             }, {
@@ -250,8 +252,14 @@ function newAdItem (req, res, adid, newAdItems) {
             if (aditem.hasOwnProperty(k)) {
                 var value = aditem[k]
 
-                if (typeof value === 'string') {
+                if (k === 'image') {
+                    if (value.imageid !== 0) {
+                        aditem['imageid'] = value.imageid
+                    }
+                } else if (typeof value === 'string') {
                     aditem[k] = value.trim()
+                } else if (!isNaN(parseInt(value))) {
+                    aditem[k] = parseInt(value)
                 }
 
             }
@@ -276,6 +284,7 @@ function newAdItem (req, res, adid, newAdItems) {
     //     text: q.text.trim(),
     //     description: description,
     //     isbn: isbn,
+    //     imageid: imageid
     // }
 
     return AdItem.bulkCreate(itemsToInsert)
@@ -287,35 +296,35 @@ function updateAd (req, res) {
 }
 
 function deleteAd (req, res) {
-    if (req.user_token) {
-        var adid = req.body.adid || null
+    var adid = parseInt(req.query.adid) || null
 
-        shared.logger.log('deleteAd', 'From user ' + req.user_token.username)
+    if ( !isNaN(adid) ) {
+        Ad.findOne({
+            where: {
+                adid: adid,
+                userid: req.user_token.userid
+            }
+        }).then(function (ad) {
+            if (ad) {
+                ad.set('deleted', 1)
+                return ad.save()
+            } else {
+                res.status(404).json({success: false, message: 'Did not delete.'})
+            }
+        }).then(function (update) {
+            shared.logger.log('deleteAd', 'Deleted ad "' + update.get('adname') + '" from user ' + req.user_token.username)
+            return res.json(update)
+        }).catch(function (err) {
+            shared.logger.log('deleteAd', 'Error happened for ' + req.user_token.username + '. ' + err, 'error')
+            return res.status(500).json({success: false, message: 'An error happened while updating.'})
+        })
 
-        if ( !isNaN(parseInt(adid)) ) {
-            Ad.findOne({
-                where: {
-                    adid: parseInt(adid),
-                    userid: req.user_token.userid
-                }
-            }).then(function (ad) {
-                if (ad) {
-                    ad.set('deleted', 1)
-                    return ad.save()
-                } else {
-                    res.status(404).json({success: false, message: 'Couldn\'t verify your integrity.'})
-                }
-            }).then(function (update) {
-                shared.logger.log('deleteAd', 'Deleted ad "' + update.get('adname') + '" for user ' + req.user_token.username)
-                res.json(update)
-            }).catch(function (err) {
-                shared.logger.log('deleteAd', 'From: ' + req.ip + '. ' + err, 'error')
-                res.status(500).json({success: false, message: 'An error happened while updating.'})
-            })
-            return
-        }
+    } else {
+        return res.status(404).json({
+            success: false,
+            message: 'Did not delete.'
+        })
     }
-    res.status(403).json({success: false, message: 'Authenticate pls'})
 }
 
 module.exports = {

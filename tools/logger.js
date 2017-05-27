@@ -5,15 +5,15 @@ function log (loggedfrom, message, state) {
     var loggedfrom  = loggedfrom || 'app',
         state       = state || 'info'
 
-    if (process.env.VERBOSE === 0) {
-        return
-    }
-
     Log.create({
         loggedfrom: loggedfrom,
         message: message,
         state: state,
     })
+
+    if (process.env.VERBOSE === 0) {
+        return
+    }
 
     console.log(message)
 }

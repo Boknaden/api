@@ -7,25 +7,24 @@
 var request     = require('request'),
     fs          = require('fs'),
     config      = require('./config.js'),
-    readline    = require('readline'),
-    mkdirp      = require('mkdirp')
+    readline    = require('readline')
 
 var rl1 = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 })
 
-console.log("Choose campus")
+console.log("Velg campus")
 for (var i = 0; i < config.campuses.length; i++) {
     console.log(i+1 + ". " + config.campuses[i])
 }
-console.log("Type 'all' to download data for all of 'em")
-console.log("Type 'view [number]' to view downloaded files")
+console.log("Skriv 'alle' for å laste ned data for alle i listen")
+console.log("Skriv 'se [nummer i listen]' for å se nedlastet data")
 
 rl1.question('', (answer) => {
     if (answer) {
 
-        if (typeof answer === 'string' && answer === 'all') {
+        if (typeof answer === 'string' && answer === 'alle') {
             var uris = [],
                 filenames = []
             for (var i = 0; i < config.campuses.length; i++) {
@@ -35,16 +34,22 @@ rl1.question('', (answer) => {
                 filenames.push(config.prefix + '-' + campus.toLowerCase())
             }
             bulkSaveData(uris, filenames)
-        } else if (typeof answer === 'string' && answer.substr(0, 4) === 'view') {
+        } else if (typeof answer === 'string' && answer.substr(0, 2) === 'se') {
             var params      = answer.split(' '),
                 idx         = parseInt(params[1]),
                 filename    = config.prefix + '-' + config.campuses[idx - 1].toLowerCase()
 
             readData(filename)
-
         } else {
-            var answer  = parseInt(answer) - 1,
-                uri     = config.uri.replace('Vestfold', config.campuses[answer])
+            var answer  = parseInt(answer) - 1
+
+            if (isNaN(answer)) {
+                console.log("Vennligst angi et tall mellom 1 og " + config.campuses.length)
+                process.exit()
+                return
+            }
+
+            var uri     = config.uri.replace('Vestfold', config.campuses[answer])
 
             saveData(uri, config.prefix + '-' + config.campuses[answer].toLowerCase())
         }
@@ -89,7 +94,7 @@ function saveData (uri, filename) {
                     console.log(err)
                 }
 
-                console.log('Wrote ' + filename + '.json to ' + config.path)
+                console.log('Skrev ' + filename + '.json til ' + config.path)
             })
         }
     })

@@ -5,10 +5,12 @@ var shared  = require('./_shared.js'),
     Campus  = shared.models.campus,
     University = shared.models.university
 
+/* Godtar to strenger, et brukernavn og et passord. */
 function authenticate (req, res) {
     var username     = req.body.username,
         passphrase   = req.body.passphrase
 
+    /* Verifisér at kombinasjonen eksisterer. Brukernavn kan også vær en e-postadresse. */
     User.findOne({
         attributes: ["userid", "username", "passphrase", "firstname", "lastname", "email", "isadmin", "verified"],
         where: { $or: [ {username: username}, {email: username} ] },
@@ -20,9 +22,10 @@ function authenticate (req, res) {
             } ]
     }).then(function (user) {
         if (user) {
-            // hashing av passord ved hjelp av blowfishalgoritmen
+            // Sammenligner passordet lagret i databasen med klartekst-passordet brukeren sendte inn
+            // ved hjelp av bcrypt
             bcrypt.compare(passphrase, user.passphrase, function (err, authed) {
-                if (err) {
+                if (err) { // Error kan skje dersom bcrypt-biblioteket ikke er riktig installert, eller av andre merkelige grunner
                     shared.logger.log('authenticate', 'From ' + user.get('username') + '. ' + err, 'error')
                     res.status(500).json({
                         success: false,
@@ -41,6 +44,7 @@ function authenticate (req, res) {
 
                 shared.logger.log('authenticate', 'User ' + user.get('username') + ' authenticated.')
 
+                // Definerer brukerdata slik at de kan signeres med JWT.
                 var userObject = {
                     userid: user.get('userid'),
                     username: user.get('username'),

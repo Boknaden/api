@@ -156,6 +156,7 @@ var Image = sequelize.define('image', {
     title: { type: Sequelize.STRING(30), allowNull: false },
     description: { type: Sequelize.TEXT, allowNull: true },
     deleted: { type: Sequelize.INTEGER, defaultValue: 0, allowNull: false },
+    deletehash: { type: Sequelize.STRING(15), allowNull: false },
 }, {
     createdAt: 'createddate',
     updatedAt: 'updateddate',

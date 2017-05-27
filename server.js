@@ -7,7 +7,8 @@ let express     = require('express'), // vi benytter express som rammeverk for �
     bodyParser  = require('body-parser'),
     config      = require('./config.js'), // brukes for å håndtere mysql-tilgang
     jwt         = require('jsonwebtoken'), // benyttes for å verifisere at et api-kall er autentisert
-    logger      = require('./tools/logger.js') // benyttes for å lagre meldinger generert av appen i database
+    logger      = require('./tools/logger.js'), // benyttes for å lagre meldinger generert av appen i database
+    busboy      = require('express-busboy') // benyttes for å håndtere filopplasting
 
 
 /* Registrerer filer i 'filepath' slik at de kan benyttes som endepunkter av APIet */
@@ -76,8 +77,19 @@ app.use(helmet()) // av sikkerhetsmessige grunner inkluderer vi helmet for å se
 app.use(bodyParser.json()) // body-parser gir oss mulighet til å "parse" post/get/put/delete data (query/body) slik at de kan benyttes i APIet
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(registerDependencies)
+busboy.extend(app, {
+    upload: true,
+    path: __dirname + '/uploads/tmp',
+    allowedPath: (url) => {
+        return url == '/image'
+    },
+    mimeTypeLimit: [
+        'image/png',
+        'image/jpeg'
+    ]
+})
 
-/* DRY metode for å gi oss tredjepartstjenester som mysql-tilgang og passordhashing */
+/* DRY metode for å gi oss tredjepartstjenester som jwt-biblioteket */
 function registerDependencies (req, res, next) {
     req.service = {
         jwt: jwt,

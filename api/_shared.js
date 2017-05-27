@@ -5,7 +5,8 @@ var logger          = require('../tools/logger.js'),
     bcrypt          = require('bcrypt'),
     randomstring    = require('randomstring'),
     nodemailer      = require('nodemailer'),
-    uuid            = require('uuid/v4')
+    uuid            = require('uuid/v4'),
+    imgur           = require('../tools/imgur/imgur.js')
 
 function sendMail (subject, email, body) {
     let transport = mailTransporter(),
@@ -95,4 +96,5 @@ module.exports = {
     randomstring: randomstring,
     sendMail: sendMail,
     uuid: uuid,
+    imgur: imgur.imgur,
 }
