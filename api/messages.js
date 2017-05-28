@@ -76,7 +76,7 @@ function newMessage (req, res) {
     if (!recipientid) {
         return res.json({
             success: false,
-            message: 'Needs a valid chat.'
+            message: 'Needs a valid recipient.'
         })
     }
 
