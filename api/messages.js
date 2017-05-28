@@ -71,7 +71,15 @@ function getChatMessages (req, res) {
 function newMessage (req, res) {
     var userid = req.user_token.userid,
         recipientid = req.body.recipientid,
+        chatid      = req.body.chatid,
         message = req.body.message || ''
+
+    if (!chatid) {
+        return res.json({
+            success: false,
+            message: 'Needs a valid chat.',
+        })
+    }
 
     if (!recipientid) {
         return res.json({
@@ -89,13 +97,7 @@ function newMessage (req, res) {
 
     Chat.findOne({
         where: {
-            $or: {
-                initiatorid: userid,
-                recipientid: userid,
-            }, $or: {
-                initiatorid: recipientid,
-                recipientid: recipientid,
-            }
+            chatid: chatid,
         }
     }).then(function (chat) {
         if (chat) {

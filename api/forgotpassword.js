@@ -65,8 +65,8 @@ function initiateReset (req, res) {
                             user.get('email'),
                             '<h2>Boknaden</h2>' +
                             '<p>Du har bedt om å resette passordet ditt hos Boknaden. Dersom det ikke var deg som ba om dette, slett denne mailen snarest.</p>'+
-                            '<a href="' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '">Tilbakestill her</a>' +
-                            '<p>Fungerer ikke lenken? Lim denne inn i søkefeltet på nettleseren: ' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '</p>'
+                            '<a href="' + process.env.INTERNAL_IP + '/resetpassword/' + pr.get('code') + '">Tilbakestill her</a>' +
+                            '<p>Fungerer ikke lenken? Lim denne inn i søkefeltet på nettleseren: ' + process.env.INTERNAL_IP + '/resetpassword/' + pr.get('code') + '</p>'
                         )
 
                         res.json({success: true})
@@ -82,8 +82,8 @@ function initiateReset (req, res) {
                         user.get('email'),
                         '<h2>Boknaden</h2>' +
                         '<p>Du har bedt om å resette passordet ditt hos Boknaden. Dersom det ikke var deg som ba om dette, slett denne mailen snarest.</p>'+
-                        '<a href="' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '">Tilbakestill her</a>' +
-                        '<p>Fungerer ikke lenken? Lim denne inn i søkefeltet på nettleseren: ' + process.env.INTERNAL_IP + ':3000/#!/resetpassword/' + pr.get('code') + '</p>'
+                        '<a href="' + process.env.INTERNAL_IP + '/resetpassword/' + pr.get('code') + '">Tilbakestill her</a>' +
+                        '<p>Fungerer ikke lenken? Lim denne inn i søkefeltet på nettleseren: ' + process.env.INTERNAL_IP + '/resetpassword/' + pr.get('code') + '</p>'
                     )
 
                     res.json({success: true})
