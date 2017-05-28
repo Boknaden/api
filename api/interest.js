@@ -2,6 +2,10 @@ var shared      = require('./_shared.js'),
     User        = shared.models.user,
     Ad          = shared.models.ad,
     AdItem      = shared.models.aditem,
+    Course      = shared.models.course,
+    Campus      = shared.models.campus,
+    University  = shared.models.university,
+    Image       = shared.models.image,
     Interested  = shared.models.interested,
     Chat        = shared.models.chat,
     ChatMessage = shared.models.chatmessage
@@ -23,13 +27,27 @@ function getInterests (req, res) {
         case 'buyer':
             // Finner alle ads, aditems og interesser for en bruker
             Ad.findAll({
+                where: {
+                    deleted: 0,
+                },
                 include: [{
                     model: AdItem,
                     include: [{
                         model: Interested,
                         where: {
                             userid: userid
-                        }
+                        },
+                    }, {
+                        model: Image,
+                        attributes: ['imageurl']
+                    }]
+                }, {
+                    model: Course,
+                    include: [{
+                        model: Campus,
+                        include: [{
+                            model: University
+                        }]
                     }]
                 }]
             }).then(function (interests) {
@@ -71,7 +89,8 @@ function getInterestsForSeller (req, res) {
 
     Ad.findAll({
         where: {
-            userid: userid
+            userid: userid,
+            deleted: 0,
         },
         include: [
             {
