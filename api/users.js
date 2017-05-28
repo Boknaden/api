@@ -104,7 +104,7 @@ function newUser (req, res) {
                         user.get('email'),
                         '<h1>Velkommen som bruker hos Boknaden!</h1>' +
                         '<p>For å være sikker på at du er en ekte person, '+
-                        'vennligst verifiser e-posten din ved å kopiere <strong><a href="'+ process.env.INTERNAL_IP + ':3000/verify/' + user.get('verificationcode') +'">' + process.env.INTERNAL_IP + ':3000/verify/' + user.get('verificationcode') +
+                        'vennligst verifiser e-posten din ved å kopiere <strong><a href="'+ process.env.INTERNAL_IP + '/verify/' + user.get('verificationcode') +'">' + process.env.INTERNAL_IP + '/verify/' + user.get('verificationcode') +
                         '</a></strong> inn i nettlseren din.</p>'
                     )
                     return res.json(user)

@@ -27,7 +27,7 @@ function changeEmail (req, res) {
             'Du har endret epost!',
             email,
             '<h1>Vennligst verifiser den nye e-posten din</h1>' +
-            '<p>Gå til følgende lenke for å verifisere: ' + process.env.INTERNAL_IP + ':3000/verify/' + newVerificationCode + '</p>'
+            '<p>Gå til følgende lenke for å verifisere: <a href="' + process.env.INTERNAL_IP + '/verify/' + newVerificationCode + '">' + process.env.INTERNAL_IP + '/verify/' + newVerificationCode + '</a></p>'
         )
         shared.logger.log('changeEmail', 'User ' + req.user_token.username + ' successfully changed email')
         return res.json({
