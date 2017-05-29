@@ -29,7 +29,6 @@ function Imgur () {
             request(options, (err, incomingmessage, response) => {
                 if (err) {
                     console.log('Error: ' + err)
-                    return
                 }
 
                 cb(err, response)

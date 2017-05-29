@@ -157,13 +157,49 @@ function getAds (req, res) {
             }
         ],
     }).then(function (ads) {
-        var payload = {
-            limit: limit,
-            offset: offset,
-            count: ads.count,
-            ads: ads.rows,
-        }
-        res.json(payload)
+        var hasNext = false
+
+        Ad.count({
+            where: suppliedWhere,
+            include: [
+                {
+                    model: Course,
+                    required: true,
+                    include: [
+                        {
+                            model: Campus,
+                            required: true,
+                            where: (campus) ? { campusid: campus } : {},
+                            include: [
+                                {
+                                    model: University,
+                                    required: true,
+                                    where: (university) ? { universityid: university } : {},
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }).then(function (adCount) {
+            if (adCount > ads.count) {
+                hasNext = true
+            }
+
+            var payload = {
+                limit: limit,
+                offset: offset,
+                count: ads.rows.length,
+                ads: ads.rows,
+                hasNextPage: hasNext
+            }
+            res.json(payload)
+        }).catch(function (err) {
+            shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')
+            console.log(err)
+            res.status(500).send({err: 'An error happened'})
+        })
+
     }).catch(function (err) {
         shared.logger.log('getAds', 'From: ' + req.ip + '. ' + err, 'error')
         console.log(err)
