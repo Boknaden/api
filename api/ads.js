@@ -182,6 +182,8 @@ function getAds (req, res) {
                 }
             ]
         }).then(function (adCount) {
+            // Jeg skal ha en telling på current page
+            // over om det finnes flere ads
             if (adCount > ads.count) {
                 hasNext = true
             }
@@ -286,16 +288,24 @@ function newAdItem (req, res, adid, newAdItems) {
 
         for (k in aditem) {
             if (aditem.hasOwnProperty(k)) {
-                var value = aditem[k]
+
+                if (k === 'price') {
+                    var value = parseInt(aditem[k])
+                    if (isNaN(value)) {
+                        aditem[k] = 0
+                    } else {
+                        aditem[k] = (value < 0) ? 0 : value
+                    }
+                }
 
                 if (k === 'image') {
-                    if (value.imageid !== 0) {
-                        aditem['imageid'] = value.imageid
+                    if (aditem[k].imageid !== 0) {
+                        aditem['imageid'] = aditem[k].imageid
                     }
-                } else if (typeof value === 'string') {
-                    aditem[k] = value.trim()
-                } else if (!isNaN(parseInt(value))) {
-                    aditem[k] = parseInt(value)
+                } else if (typeof aditem[k] === 'string') {
+                    aditem[k] = aditem[k].trim()
+                } else if (!isNaN(parseInt(aditem[k]))) {
+                    aditem[k] = parseInt(aditem[k])
                 }
 
             }
