@@ -245,6 +245,7 @@ User.hasMany(ChatMessage, { foreignKey: 'userid' })
 User.hasMany(PasswordReset, { foreignKey: 'userid' })
 User.hasMany(Interested, { foreignKey: 'userid' })
 User.hasMany(Curriculum, { foreignKey: 'userid' })
+User.hasMany(CurriculumVotes, { foreignKey: 'userid' })
 User.belongsTo(Course, { foreignKey: 'courseid' })
 
 University.hasMany(Ad, { foreignKey: 'universityid' })
@@ -272,20 +273,24 @@ AdItem.belongsTo(Image, { foreignKey: 'imageid' })
 Interested.belongsTo(AdItem, { foreignKey: 'aditemid' })
 Interested.belongsTo(User, { foreignKey: 'userid' })
 
-Image.belongsTo(User, { foreignKey: 'userid' })
 Image.hasMany(AdItem, { foreignKey: 'imageid' })
+Image.belongsTo(User, { foreignKey: 'userid' })
 
+Chat.hasMany(ChatMessage, { foreignKey: 'chatid' })
 Chat.belongsTo(User, { as: 'Initiator', foreignKey: 'initiatorid' })
 Chat.belongsTo(User, { as: 'Recipient', foreignKey: 'recipientid' })
-Chat.hasMany(ChatMessage, { foreignKey: 'chatid' })
 
 ChatMessage.belongsTo(Chat, { foreignKey: 'chatid' })
 ChatMessage.belongsTo(User, { foreignKey: 'userid' })
 
 PasswordReset.belongsTo(User, { foreignKey: 'userid' })
 
+Curriculum.hasMany(CurriculumVotes, { foreignKey: 'curriculumid' })
 Curriculum.belongsTo(User, { foreignKey: 'userid' })
 Curriculum.belongsTo(Course, { foreignKey: 'courseid' })
+
+CurriculumVotes.belongsTo(User, { foreignKey: 'userid' })
+CurriculumVotes.belongsTo(Curriculum, { foreignKey: 'curriculumid' })
 
 module.exports = {
     sequelize: sequelize,
