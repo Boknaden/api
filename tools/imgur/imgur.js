@@ -31,8 +31,10 @@ function Imgur () {
                     console.log('Error: ' + err)
                 }
 
-                cb(err, response)
-                fs.unlink(filePath)
+                fs.unlink(filePath, (err) => {
+					console.log(err)
+				})
+				cb(err, response)
             })
         })
     }
